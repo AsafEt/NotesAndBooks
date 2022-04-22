@@ -1,0 +1,796 @@
+\documentclass[a4paper, 11pt, oneside]{book}
+\include{../../Preambles/LectureNotesPreamble}
+
+\begin{document}
+
+\lfoot{\footnotesize Combinatorics 80520}
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+
+        \LARGE
+        \textbf{The Probabilistic Method in Combinatorics 80721}
+
+        \vspace{0.5cm}
+        \Large
+        Based on lectures by Dr. Yuval Peled, and the book by Alon and Spencer - \emph{The probabilistic method}
+
+        \vspace{1.5cm}
+        \large
+        \textbf{Notes by Asaf Etgar}\\
+        Spring 2022\\
+        
+
+%        \vfill
+
+
+
+        \vspace{0.8cm}
+
+        \large
+        Last edit:
+        \today \\
+        For any corrections, requests for additions or notes - please email me at \\
+        \ttfamily{asafetgar@gmail.com}\\
+        		\vspace{0.8cm}
+        \textit{These notes have not been revised by the course staff, and some things may appear differently than in the lectures/ recitations.}
+
+    \end{center}
+\end{titlepage}
+
+\tableofcontents
+\chapter{Introcuction}
+\section{Ramsey Numbers}
+
+\begin{claim}
+	For any graph $G = (V,E)$ there exists a partitioning of $V = A\sqcup B$ such that at least half of the edges are $A-B$ edges.
+\end{claim}
+\begin{proof}
+	Consider a random partition of $V$, $A,B$. That is, each vertex $v$ is in $A$ or in $B$ w.p $\frac{1}{2}$ independently. Then:
+	\[
+	\Exp{e(A,B)} \nim{linearity}= |E|\cdot \prob{e\text{ is an $A,B$ edge}} = \frac{|E|}{2}
+	\]
+	Which implies that there exists. a partition with said property.
+\end{proof}
+\begin{remark}
+One can prove this claim without the use of probability.	
+\end{remark}
+There are questions that we do not know yet how to solve without the use of probability:
+\begin{yellowBox}
+\begin{defn}
+	[Ramsey Number] The number $R(k,l)$ is the minimal $n$ such that every graph $G$ over $n$ vertices contains a $k$-clique or an $l$ -anti-clique.
+\end{defn}	
+\end{yellowBox}
+\begin{thm}[Ramsey]\label{thm:Ramsey} $R(k,l)\le {k-l-2\choose k-1}$. In particular, $R(k,k)\le {2k-2\choose k-1} \approx \frac{4^{k-1}}{\sqrt{\pi k}}$
+	
+\end{thm}
+\begin{thm}\label{thm:Lower Bound Ramsey}
+	If ${n \choose k}2^{1-{k\choose 2}} < 1$, then $R(k,k) > n$
+\end{thm}
+\begin{proof}  Consider now a random graph $G\sim G(n,\frac{1}{2})$. For any $A\in {[n]\choose k}$, denote by $M_A$ the event that $A$ is a clique or anti-clique in $G$. Then:
+	\[
+	\prob{M_A} = \prob{\text{$A$ is a clique}} + \prob{\text{$A$ is an anti-clique}} = 2^{1-{k\choose 2}}
+	\]
+	And therefore
+	
+	\[
+	\prob{\text{$\exists$ a clique or anti-clique of size $k$}} = \prob{\bigcup_{A\in {[n]\choose k}} M_A }\le \sum_{A\in {[n]\choose k}} \prob{M_A} = {n\choose k} 2^{1-{k\choose 2}} < 1
+	\]
+	Hence there exists a graph over $n$ vertices without a clique or anti-clique of size $k$.
+\end{proof}
+\begin{remark}
+Note that
+	\begin{align*}
+		& {n \choose k}2^{1-{k\choose 2}} < 1 \iff {n \choose k} < 2^{{k\choose 2} - 1}
+	\end{align*}
+	And also, ${n\choose k} \le \frac{n^k}{k!}$, and by Stirling's approximation - $k! \ge \rbk{\frac{k}{e}}^k$. Pluggin in the inequality:
+	\[
+	{n\choose k} \le \rbk{\frac{en}{k}}^k
+	\]
+Comparing this to the formula in \ref{thm:Ramsey}, this is a very loose bound (at least for $k,k$).
+\end{remark}
+\begin{remark}
+If $n = 2^{k/2}$, then:
+\[ \prob{\text{A random graph contains a clique or anti-clique}} \le {n\choose k}2^{1-{k\choose 2}} \nim{n,k}\To 0 \]
+
+ Which means "almost all graphs are Ramsey graphs", but we do not yet  have any explicit construction.
+\end{remark}
+This theorem implies that we know the existence of a graph of order $n$ and without clique or anti-clique of size $k\approx 2\log n$. The best construction known without the use of probability is for $k = \log^{C\cdot \log\log\log n}n$.
+
+\chapter{Linearity of Expectation}
+\section{Sum-Free Sets}
+\begin{thm}
+	For any  $B\in {\NN\choose n}$ (with repetitions), there exists $A\in {B\choose n/3}$ such that there are no $a,b,c\in A$ with $a + b = c$
+\end{thm}
+\begin{proof}
+	[Proof (by Erd\H{o}s)] Denote $[x] = x-\Floor{x}$, and for any $t\in [0,1]$ let $A_t = \cbk{b\in B \mid [tb]\in \rbk{\frac13,\frac23}}$. 
+		For any $t$, $A_t$ is sum-free: If $a,b\in A_t$ and $[ta],[tb]\in \rbk{\frac13,\frac23}$, then $[a+b]\notin \rbk{\frac13,\frac23}$. We consider the probability space of the coin tosses of $t$. Denote $X_i = \one_{b_i\in A_t}$, then $\prob{X_i=1} = \frac13$. Hence consider the expectation of a size of a random $A_t$:
+		\begin{flalign*}
+			& \Exp{|A_t|} = \sum_{i\in [n]} \Exp{X_i} = \frac{n}{3}
+		\end{flalign*}
+\end{proof}
+\begin{remark}
+The general idea of probabilistic methods is to find an object in which the property always holds, and then average over these objects	
+\end{remark}
+
+\section{Tournaments}
+\begin{yellowBox}
+\begin{defn}
+	A tournament is an orientation of $K_n$.
+\end{defn}
+\begin{defn}
+	We say a vertex $v$ \emph{overcomes} some $A\subset V\setminus x$ if $v\to x$ for any $x\in A$ (that is, the orientation of $vx\in E(K_n)$ is $v\to x$).
+\end{defn}
+\end{yellowBox}
+
+\begin{thm}
+	If ${n\choose k}\rbk{1-2^{-k}}^{n-k}$, then there exists a tournament such that for any $A\in {V\choose k}$ there exists $v$ that overcomes $A$.
+\end{thm}
+\begin{proof}
+Denote by $S_k$ the event that for any $A$ of size $k$ there exists an overcoming $v$.
+	Consider a random tournament, and let $A\in {V\choose k}$, what is the probability that no $v$ overcomes $A$?
+	\[
+	\prob{\text{No $v$ overcomes $A$}} = \rbk{1-2^{-k}}^{n-k}
+	\]
+	(some $v$ overcomes $A$ w.p $2^k$, and they are independent) Then:
+	\[
+	\prob{S_k^c}\le {n\choose k}\rbk{1-2^{-k}}^{n-k} < 1
+	\]
+\end{proof}
+\begin{remark}
+	The union bound is quite similar to linearity of expectation.
+\end{remark}
+\begin{thm}
+	There exists a tournament with at least $n!\cdot 2^{-(n-1)}$ Hamiltonian cycles. 
+\end{thm}
+\begin{proof}
+	Consider a random tournament. Then:
+	\begin{flalign*}
+		&\Exp{\#\text{ of Hamiltonian cycles}} = \sum_{\pi\in S_n}\prob{\pi(V)\text{is a cycle}} = n!2^{-(n-1)}
+	\end{flalign*}
+	(the last equation is the probability of this permutation defininig a cycle)
+	Then there must exist a tournament with at least this number of cycles.
+\end{proof}
+\section{??? If you have a suggestion for a name, let me know!}
+\begin{thm}
+	Let $v_1,\ldots v_n\in \RR^d$ be unit vectors. Then there exists $\varepsilon_1,\ldots\varepsilon_n\in \{\pm 1\}$ such that
+	\[
+	\norm{\sum_{i\in [n]}\varepsilon_iv_i}\le \sqrt{n}
+	\]
+	and there exists such $\varepsilon_i$ for the opposite inequality.
+\end{thm}
+\begin{proof}
+	Consider a random choice of $\varepsilon_i$. Denote $X = \norm{\sum_{i\in [n]}\varepsilon_iv_i}^2$. Then:
+	\[
+	X = \norm{\sum_{i\in [n]}\varepsilon_iv_i^2} = \sum_{i\in [n]} \varepsilon_i^2 v_i + 2\cdot \sum_{i<j} \varepsilon_i\varepsilon_j\tbk{v_i,v_j}
+	\]
+	then
+	\[
+	\Exp{X} = n + 2\cdot \sum_{i<j}\tbk{v_i,v_j}\Exp{\varepsilon_i\varepsilon_j} = n
+	\]
+	Since $\Exp{\varepsilon_i\varepsilon_j} = \Exp{\varepsilon_j}\Exp{\varepsilon_j} = 0\cdot 0 = 0$, and the claim follows as usual.
+\end{proof}
+\subsection{Derandomization}
+We would like to de-randomize the process and find an efficient algorithm of finding these $\varepsilon_i$. By the law of total expectation, $\Exp{X} = \frac12\Exp{X\mid \varepsilon_1 = 1} + \frac12\Exp{X\mid \varepsilon_1 = -1}$.
+\begin{claim}
+	If we've fixed $\varepsilon_1\ldots \varepsilon_{i-1}$ such that $\Exp{X\mid \varepsilon_1\ldots\varepsilon_{i-1}}\le n$, then we can efficiently find $\varepsilon_i$ such that $\Exp{X\mid \varepsilon_1\ldots\varepsilon_{i-1}, \varepsilon_i}\le n$
+\end{claim}
+\begin{proof}
+	\[
+	\Exp{X\mid \varepsilon_1\ldots\varepsilon_{i-1}} \nim{\star}= \frac12\Exp{X\mid \varepsilon_1\ldots\varepsilon_{i-1},\varepsilon_i = 1} + \frac12\Exp{X\mid \varepsilon_1\ldots\varepsilon_{i-1},\varepsilon_i = -1}
+	\]
+	with $\star$ by law of total expectation (w.r.t the random variable $\varepsilon_i$). But
+	\[
+	\Exp{X\mid \varepsilon_1\ldots\varepsilon_{i-1},\varepsilon_i = 1} = n + 2\sum_{j'<j \le i}\varepsilon_{j}\varepsilon_{j'}\tbk{v_j,v_i} + 0
+	\]
+	And we know the values of $\varepsilon_{j'},\varepsilon_j$, so we can compute it efficiently. Then we choose the epsilon Todo{Compete from the book}
+\end{proof}
+\section{Turan's theorem}
+\begin{thm}
+	In any graph $(V,E)$, there exists an independent set of size at least $\sum_{v\in V}\frac{1}{deg(v) + 1}$
+\end{thm}
+\begin{proof}
+	Consider a random ordering of $V$. We choose a vertex to add to the set $I$ ("independent") if he appears before all of his neighbors. Clearly $I$ is independent. And:
+	\[
+	\Exp{|I|} = \sum_{v\in V}\prob{v\in I} = \sum_{v\in V}\prob{\text{$v$ is the first of hie neighbors in the ordering}} = \sum_{v\in V}\frac{1}{deg(v) +1}
+	\]
+\end{proof}
+\begin{cor}
+	In $G$ there exists a clique of size $\ge \sum_{v\in V}\frac{1}{n-deg(v)}$
+\end{cor}
+\begin{thm}
+	[Tur\a'an] If the maximal clique is of size $r$, then \[
+	r\ge \sum_{v\in V}\frac{1}{n-\deg(v)} \ge \frac{n^2}{n^2-2|E|}
+	\]
+	Therefore $|E| \le \rbk{1-\frac{1}{n}}\cdot\frac{n^2}{2}$
+\end{thm}
+\section{Unbalancing Lights}
+Let $A$ be an $n\times n$ matrix over $\{\pm 1\}$. There is a switch for every row and every column, which flips all bits corresponding to it.
+\begin{thm}
+	There exists $x,y\in \cbk{\pm 1}^n$ \footnote{think of $x$ as responsible of rows, and $y$ of columns} such that $x^\top Ay \ge \rbk{\sqrt{\frac{2}{\pi}} + o(1)}n^{\frac32}$
+\end{thm}
+\begin{proof}
+	Choose a random $y$ (that is, $y_i\sim U(\pm 1)$ iid. Let $R_i = \sum_{j=1}^nA^i_jy_j$. Since $y_i$ are iid, $A^i_jy_j \sim $ a sum of $n$ signs$ \pm 1 $ iid. Then by CLT:
+	\[
+	\frac{1}{\sqrt{n}}R_i\nim{distribution}\To \Nn(0,1)
+	\]
+	And therefore $\Exp{\frac{1}{\sqrt{n}}|R_i|} \nim{n\to\infty}\To \Exp{|z|} = \sqrt{\frac{2}{\pi}}$. Hence:
+	\[
+	\Exp{\sum_{i=1}^n |R_i|} = \sum_{i=1}^n \Exp{|R_i|} = \rbk{\sqrt{\frac{2}{\pi}} + o(1)}n^\frac32
+	\]
+	Then there exists $y$ such that $\sum_{i=1}^n |R_i| \ge \rbk{\sqrt{\frac{2}{\pi}} + o(1)}n^\frac32$. As for $x$, note that 
+	\[
+	x^\top Ay = \sum_{i=1}^n\sum_{j=1}^n x_iA^i_jy_j = \sum_{i=1}^nx_iR_i \nim{\star}= \sum_{i=1}^n |R_i| \ge \rbk{\sqrt{\frac{2}{\pi}} + o(1)}n^\frac32
+	\]
+	with $\star$ since we can take $x_i = sign(R_i)$.\footnote{In some sense, this is "the smartest move" in order to get as many light bulbs lit as possible.}
+\end{proof}
+\section{2-colorings of hypergraphs}
+\begin{yellowBox}
+\begin{defn}
+	[$k$-uniform Hypergraph] $H = (V,E)$  is a $k$-uniform Hypergraph with $V(H)$ its vertices and $E(H) \subset {V(H)\choose k}$. In particular, a $2$-uniform hypergraph is just a graph.
+\end{defn}	
+\begin{defn}
+	[2-coloring of hypergraph] Let $H$ be a $k$-graph. A \emph{2 coloring} of $H$ is a function $f:V(H)\to \{0,1\}$ such that there is no monochromatic edge, that is $\forall e\in E(H) \quad \exists x,y\in e \quad f(x)\neq f(y)$. 
+\end{defn}
+\begin{defn}
+	Denote $m(k)$ the minimal number of edges in a $k$-graph that is not $2$ colorable.
+\end{defn}
+\end{yellowBox}
+\begin{example}
+	$m(2) = 3$, consider a triangle.
+\end{example}
+\begin{example}
+	$m(3) = 7$, consider the Fano Plane.
+\end{example}
+\begin{thm}
+\label{thm: bound on minimal edges in no 2 color hyper}
+	$m(k)\ge 2^{k-1}$
+\end{thm}
+\begin{proof}
+	Let $H$ be a hypergraph with less than $m2^{k-1}$ edges. Let $f$ be a uniformly random coloring of $H$ Then
+	\[
+	\prob{e\text{ is monochromatic}} = 2^{1-k}
+	\]Therefore
+	\[
+	\Exp{\#\text{monochromatic edges}} < m\cdot2^{1-k} = 1
+	\]
+\end{proof}
+\begin{thm}
+$m(k) = O(k^22^k)$.	
+\end{thm}
+\begin{proof}
+	Let $n = k^2$, and choose $c\cdot k^22^k$ (we specify $c$ later) edges uniformly IID. We show that $\Exp{\#\text{colorings without monochromatic edges}} < 1$. Fix a coloring $\varphi:[n]\to \{0,1\}$. Let $a = |\varphi^{-1}(0)|$, then
+	\begin{align*}
+	&\prob{\text{$e$ is monochromatic under $\varphi$}} =\\ &\frac{{a\choose k} + {n-a \choose k}}{{n\choose k}} \ge \frac{2\cdot{n/2\choose k}}{{n\choose k}} \ge \frac{2\cdot \frac{(\frac{n}{2} - k)^k}{k!} }{\frac{n^k}{k!}} = 2\rbk{\frac{1}{2}-\frac{k}{n}}^k = 2\cdot\rbk{\frac{1}{2}}^k\rbk{1-\frac{2}{k}}^k \ge c\rbk{\frac{1}{2}}^k
+	\end{align*}
+	for some $c$. Now we have
+	\begin{align*}
+		&\Exp{\#\text{colorings without monochromatic edges}} = \sum_{\varphi}\prob{\text{no edge is monochromatic under $\varphi$}} \le \\
+		& \le 2^n\rbk{1-\frac{c}{2^k}}^m \le e^{\log(2)\cdot n - c\cdot 2^{-k}\cdot m} \nim{\star}< 1
+	\end{align*}
+	With $\star$ by choice of $m = \frac{2\log(2)}{c}k^2\cdot 2^k$.
+\end{proof}
+\begin{thm}
+	[Improvement on the bound from \ref{thm: bound on minimal edges in no 2 color hyper}] $m(k)\ge t 2^k\sqrt{\frac{k}{\log(k)}}$.
+\end{thm}
+\begin{proof}
+	Or proof is algorithmic: Let $H$ be with $t$ edges, color all $V(H)$ in blue. Traverse $V(H)$ in a random order, let $v$ the current vertex. If $v$ is the last-visited vertex in a monochromatic blue edge - alter its color to blue. The algorithm fails only if there is a monochromatic red edge. This happens only if the vertex $v = e\cap f$, $f$ is red, $e$ is blue and $v$ is the first in $f$ and last in blue (this is a bad configuration). What is the probability of such configuration to occure? We consider the probability over the coin tosses of $\pi\sim U(S_n)$, and claim
+	\[
+	\prob{\text{there exists a bad configuration}} < 1
+	\]
+	We note that:
+	\begin{flalign*}
+		& \prob{\text{there exists a bad configuration}}\le \Exp{\#\text{$(e,f)$ are bad edges}} \nim{\star}\le m^2\cdot\frac{\rbk{(k-1)!}^2}{(2k-1)!} = \\
+		&\frac{m^2}{(2k-1){2k-2 \choose k-1}}\nim{\star\star}= \frac{m^2\cdot(c + o(1))}{\sqrt{k\cdot 4^k}}\nim{?}<1
+	\end{flalign*}
+	with $\star$ a bound on the number of edges that intersect in a unique vertex, times the probability of having a bad configuration, and $\star\star$ since ${2n\choose n} = \frac{c + o(1)}{\sqrt{n}}2^{2n}$. In order to have $?$, take $m < c'\cdot k^{\frac{1}{4}}\cdot 2^k$. This is not the bound we want - as the power of $k$ is $\frac{1}{4}$. The problem is the expectation sometimes lies - that is, the expectation can be much larger than the probability we want to bound (see the remark below).\\
+	
+	We traverse the vertices differently: For a vertex $v$, choose $r_v\sim U([0,1])$ i.i.d, and traverse $V(H)$ according to $r_v$ from the smallest to largest. Let $p$ be some probability chosen later, and denote
+	\[
+	L = \sbk{0,\frac{1-p}{2}}\quad M = \sbk{\frac{1-p}{2},\frac{1+p}{2}}\quad R = \sbk{\frac{1+p}{2},0}
+	\]
+	Now:
+	\begin{flalign*}
+		 &\prob{\text{there exists a bad configuration}}\le\\ 
+		 &\overbrace{\prob{\exists e\in L\cup R}}^1 + \overbrace{\prob{\exists\text{bad configuration whose intersection is in $M$}}}^2 \le \\
+		 &\overbrace{m\cdot 2(|L|)^k}^1 + \overbrace{m^2 \int_{\frac{1-p}{2}}^\frac{1+p}{2}r^{k-1}_v(1-r_v)^{k-1}dr_v}^2= \\
+		 & m\cdot rbk{\frac{1-p}{2}}^k + m^2 \int_{\frac{1-p}{2}}^\frac{1+p}{2}r^{k-1}_v(1-r_v)^{k-1}dr_v \le \\
+		 & 2m\frac{e^{-pk}}{2^k} + m^2\cdot p\rbk{\frac{1}{4}}^{k-1} \nim{?}<1
+	\end{flalign*}
+	Choosing $p = \frac{\log k}{k}$ and $m<\frac{1}{4}2^k\sqrt{\frac{k}{\log k}}$ yields the result.
+\end{proof}
+\begin{remark}
+	Let $X_n = n^2$ with probability $1/n$ and $0$ otherwise. Note that $\prob{X_n > 0} = 1/n$, while $\Exp{X_n} = n$.
+\end{remark}
+
+
+\chapter{Alterations Method}
+Up to this point, we made a random choice of object and use it. We now deal with the setting where a na\"{\i}ve random choice is not good enough - but we cat alter it a little bit so it would be good. The idea here is to bound the expectations of alterations needed to the random object.
+\section{Dominating Sets}
+\begin{yellowBox}
+\begin{defn}
+	Let $G$ be a graph. $A\subset V$ is \emph{Dominating} if any $v\in V$ has a neighbor in $A$.
+\end{defn}	
+\end{yellowBox}
+\begin{thm}
+	Let $G$ be of minimal degree $\delta$, then there exists a dominating set of size $n\cdot \frac{\ln(1+\delta}{1+\delta}$.
+\end{thm}
+\begin{proof}
+	Let $B\subset V$ such that any $v\in B$ with probability $p$ (will be chosen later) independently. Let $C_B$ be the collection of vertices that all of their neighbors are not in $B$, that is $C_B = \cbk{x\notin B\mid \forall vx\in E\quad v\notin B}$. Clearly $A = B\cup C_B$ is dominating. Then
+	\[
+	\Exp{|A|} = \Exp{|B|} + \Exp{|C_B|} = np + n\prob{v\in C_B}\nim{\star}\le np ne^{-p(1+\delta)}
+	\]
+	With $\star$ since $\prob{v\in C_B} = (1-p)^{1+deg(x)}\le (1-p)^{1+\delta)} \le e^{-p(1+\delta)}$.
+	 Find the optimal $p$ by differentiating w.r.t $p$,  and get $p = \frac{\ln(1+\delta)}{1+\delta}$, then $\Exp{|A|} \le n\rbk{\frac{\ln(1+\delta)+1}{1+\delta}}$
+\end{proof}
+\section{Ramsey Numbers - Revisited}
+Recall that \ref{thm:Lower Bound Ramsey} gives us a lower bound on Ramsey numbers. We will use alterations to improve this lower bound.
+\begin{thm}
+	\label{thm: Ramsey Lower bound Improved}For any $n,k$, $R(k,k)\ge n-{n\choose k}\cdot 2^{1-{k\choose 2}}$
+\end{thm}
+\begin{proof}
+	Consider $G\sim \Gg(n,\frac{1}{2})$. Note that $\Exp{\# \text{monochromatic sets of size }k}= {n\choose k}2^{1-{k\choose 2}}$ as we've seen, therefore there exists a graph with at most this amount of monochromatic sets of size $k$, denote it $G$. Let $G'$ be the graph obtained from $G$ by removing a single vertex of any monochromatic set of size $k$. Then $|V(G)|$ is at least $n-{n\choose k}\cdot 2^{1-{k\choose 2}}$, and clearly in $G'$ there is no monochromatic set of size $k$.
+\end{proof}
+\begin{cor}
+$R(k,k) \ge n-\frac{e^n}{k}2^{1-{k\choose 2}}$ by the Stirling-esque estimation done in chapter $1$. The optimal $n$ is 	$\frac{2^{k/2}\cdot k}{e}$ which yields $R(k,k)\ge 2^{k/2}k\cdot\rbk{\frac{1+o(1)}{e}}$.
+\end{cor}
+\section{Girth and coloring}
+\begin{yellowBox}
+Let $G = (V,E)$ be a graph.
+\begin{defn}
+	[Girth] 
+	The \emph{girth} of $G$ is the length of a minimal cycle in $G$. 
+\end{defn}	
+\begin{remark}
+	In particular, if the girth is $\ge g$, then for any $v\in V$, its $g$-neighborhood looks like a tree.
+\end{remark}
+\begin{defn}
+	[Chromatic Number] The \emph{chromatic number } of $G$, denoted $\chi(G)$ is the minimal $k$ such that there exists a proper coloring $c:V\to [k]$ of $G$.
+\end{defn}
+\begin{remark}
+	It is difficult to know what $\chi(G)$ is - it is $\NPhard$
+\end{remark}
+\begin{defn}
+	[Independence number] The \emph{Independence Number }of a graph $G$, denoted $\alpha(G)$, is the size of a largest independent set in $G$.
+\end{defn}
+\end{yellowBox}
+\begin{claim}
+	If $T$ is a tree, then $\chi(T) = 2$
+\end{claim}
+\begin{proof}
+	It is bipartite - use BFS.
+\end{proof}
+\begin{thm}
+	[Erd\H{o}s] \label{thm: High girth and chromatic}For any $k,g$ there exists a graph $G$ with $\chi(G) \ge k$ and girth $\ge g$.
+\end{thm}
+\begin{remark}
+	This is surprising! Any neighborhood seems like $\chi$ should be small (as neighborhoods look like trees) - but it turns out it cannot be considered locally; $\chi$ is a \emph{global} property of $G$.
+\end{remark}
+For ease - we write $\alpha(G) = \alpha$, same for $\chi$.
+\begin{lemma}
+	$V(G)\le \alpha\cdot\chi$.
+\end{lemma}
+\begin{proof}
+	If $c:V\to [\chi]$ is a proper coloring, any $c^{-1}(i)$ is independent.
+\end{proof}
+\begin{lemma}
+	There exists a graph $G$ over $n$ vertices (for a large enough $n = n(k,g)$) with the following properties:
+	\begin{enumerate}
+  \item The number of cycles of length $\le g$ is smaller than $\frac{n}{2}$
+  \item $\alpha(G) \le 3\log n\cdot n^{1-\frac{1}{2g}}$
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+	Let $G \sim \Gg(n,p)$ with $p = n^{\frac{1}{2g}-1}$. Let $X$ be the number of cycles of length $\le g$. Then:
+	
+	\[
+	\Exp{X}\nim{1}= \sum_{r=3}^g {n\choose r}\cdot \frac{(r-1)!}{2}\cdot p^r\nim{2}\le \sum_{r=3}^g (n\cdot p)^r \nim{3}\le g\cdot (n\cdot p)^g = g\sqrt{n}
+	\]
+	Justifications:
+	\begin{enumerate}
+  \item Choose which vertices are in a cycle of length $r$ (${n\choose r}$) and order them in a cycle ($(r-1)!/2$ options) and multiply by the probability of such cycle to exists.
+  \item Bound ${n\choose r}\cdot \frac{(r-1)!}{2}$ from above naturally.
+  \item Bound the sum with the largest element in the summation.
+\end{enumerate}
+Hence by Markov:
+\[
+\prob{X > n/2} \le \frac{g\sqrt{n}}{n/2}\nim{n\to \infty}\To 0
+\]
+Which implies the first property. For the second property, let $t = 3\log n\cdot n^{1-\frac{1}{2g}}$. Now:
+\begin{displaymath}
+  \prob{\alpha(G)\ge t}\le {n\choose t}(1-p)^{t\choose 2} \leq n^t\rbk{e^{-p}}^{t\choose 2} \le n^te^{-p\cdot{t\choose 2}} = e^{t(\log n - \frac{p\cdot t}{2} + 1)} = e^{t(-\frac{1}{2}\log n + 1)}\nim{n\to \infty}\To 0
+\end{displaymath}
+
+
+\end{proof}
+\begin{proof}
+	[Proof (of \ref{thm: High girth and chromatic})] Let $G'$ be a graph obtained from $G$ by removing a single vertex from any cycle of length smaller than $g$. Then $G'$'s girth is at least $g$. And $\alpha(G')\le \alpha(G)\le 3\log n\cdot n^{1-\frac{1}{2g}}$, and note that
+	\[
+	\chi(G')\ge \frac{|V(G')|}{\alpha(G')}\ge \frac{\frac{n}{2}}{3\log n\cdot n^{1-\frac{1}{2g}}}\ge \frac{n^\frac{1}{2g}}{6\cdot \log(n)}\nim{n\to \infty}\To \infty
+	\]
+\end{proof}
+
+\section{Heilbronn triangle problem}
+Let $P\subset [0,1]^2$, $|P| = n$, denote $T(P) = \underset{x,y,z\in P}{\min} Area(xyz)$, and let $T(n) = \underset{|P| = n}{\max} T(P)$. Heilbornn conjectured\footnote{falsely} that $T(n) = \Theta(\frac{1}{n^2})$.
+\begin{thm}
+	[KPS, no proof] $T(n) = \Omega\rbk{\frac{\log(n)}{n^2}}$
+\end{thm}
+\begin{remark}
+	We still do not know some $f$ for which $T(n) = \Theta(f(n))$, the best upper bound is still not tight.
+\end{remark}
+\begin{thm}
+	$T(n) \ge \frac{1}{70n^2}$
+\end{thm}
+\begin{proof}
+	Let $\varepsilon=\frac{1}{70n^2}$. Generate $2n$ points $\sim U([0,1]^2)$ IID and remove a point from any triangle of area less than $\varepsilon$. Given a tringle $xyz$, Let $t$ be the distance $xy$. then $t$ has some density $f_{dist}(t)$. Then:
+	
+	\[
+	\prob{area(xyz)\le \varepsilon} \l \int_0^{\sqrt{2}}\sqrt{2}\cdot 4\frac{\varepsilon}{t}f_{dist}(t)dt = (\star)
+	\]
+%	\todo{Add drawing from phone}
+	
+	Note that $f_{dist}(t) = \lim_{h\to 0}\frac{1}{h}\prob{t\le dist(x,y)) \le t+h}$ by the definition of density. Hence $f_{dist(x,y)}(t)\le \lim_{h\to 0}\frac{1}{h}\pi((t+h)^2 - t^2)) = 2\pi t$, then:
+	\[
+	(\star) \le \int_0^{\sqrt{2}} \sqrt{2}\frac{4\varepsilon}{t}2\pi t dt = 16\pi \varepsilon
+	\]
+	Which implies
+	\[
+	\Exp{\text{number of triangles with area smaller than $\varepsilon$}} \le {2n\choose 3} \frac{16\pi }{70n^2} < n
+	\]
+\end{proof}
+\begin{remark}
+	Erd\H{o}s has a non-combinatorial construction. Let $n$ be some prime, and consider the grid $[n-1]\times [n-1]$\footnote{Can rescale for the unit cube later...} and take $\cbk{(k,k^2\mod n)}_{k\in [n-1]}$. Note that the smallest triangle of $3$ points in $\ZZ^2$ is of area $1/2$, unless the three points are on the same diagonal. If they are on the diagonal $ax+b$, this means that there exists three values of $k$ such that $(ak+b) = k^2 \mod n$, but this is a quadratic polynomial in $\FF_n[x]$, therefore it cannot have more than $2$ solutions. Hence by scaling, $T(n) \ge \frac{1}{2(n-1)^2}$
+\end{remark}
+\chapter{Second Moment Method}
+Up until now we discussed \emph{first moment methods}. More formally, if $X = X_n\ge 0$ is an integer valued random variable, then the first moment method tells us that if $\Exp{X_n}\nim{n\to \infty}\To 0$, then $\prob{X_n>0}\nim{n\to\infty}\To 0$. 
+\begin{example}
+	[First Moment Method] When $G\sim \Gg(n,p)$ is triangle-free? Denote $X$ the number of traiangels in $G$. Then
+	\[
+	\Exp{X} = {n\choose 3}p^3\le (np^3)
+	\]
+	Then taking $p = o\rbk{\frac{1}{n}}$ results in $\prob{X > 0}\nim{n\to 0}\To 0$. Is this bound \emph{tight}? We saw that the expectation does not always give us a good bound - we need a way to reason about when is $X$ concentrated about its expectation - that is the variance.
+\end{example}
+\begin{yellowBox}
+\begin{defn}
+	[Variance] The variance of $X$ is $Var{X} = \Exp{\rbk{X-\Exp{x}}^2}$
+\end{defn}	
+\begin{defn}
+	[Covariance] The covariance of $X,Y$ is $$cov{X,Y} = \Exp{(X-\Exp{X})\cdot(Y-\Exp{Y})} = \Exp{XY} - \Exp{X}\cdot\Exp{Y}$$
+\end{defn}
+\begin{thm}
+	[Chebyshev]\label{thm:Chebyshev ineq} $\prob{|X-\Exp{X}|\ge t}\le \frac{Var{X}}{t^2}$
+\end{thm}
+\begin{cor}
+	$\prob{X = 0}\le \frac{Var(X)}{\Exp{X}^2}$
+\end{cor}
+\begin{cor}
+If $Var{X} = o\rbk{\Exp{X}^2	}$ then $\prob{X=0}\To 0$
+\end{cor}
+
+\end{yellowBox}
+This results in the \emph{Second moment method}: If $Var{X} = o\rbk{\Exp{X}^2}$ then $\prob{X\ge 0}\nim{n\to\infty}\To 0$. An equivalent condition is $\Exp{X^2} = \Exp{X}^2(1+o(1))$\footnote{Since $Var{X} = \Exp{X^2} - \Exp{
+X}^2$}
+An important case is when $X = \sum_{i=1}^mX_i$, in that case \[
+Var{X} = \sum_{i=1}^m Var{X_i} + \sum_{i=1}^m\sum_{j\neq i}cov{X_i,X_j}
+\]
+If we denote $i\sim j$ when $X_i,X_j$ are dependent, then
+\[
+Var{X} = \sum_{i=1}^m Var{X_i} + \sum_{i=1}^m\sum_{j\sim i}cov{X_i,X_j}
+\]
+
+\paragraph{Assumptions:}
+\begin{enumerate}
+	\item $X_i = \one_{A_i}$, then $Var{X_i} = \prob{A_i}\cdot(1-\prob{A_i})\le \prob{A_i}$ and $Cov{X_i,X_j} = \prob{A_i\cap A_j} - \prob{A_i}\cdot \prob{A_j}\le \prob{A_i\cap A_j} = \prob{A_i}\cdot \prob{A_j\mid A_i}$. Under this assumption, we get 
+	\[
+	Var{X}\le \Exp{X} + \sum_i\prob{A_i}\cdot\sum_{i\sim j} \prob{A_j\mid A_i}
+	\] 
+	\item A symmetry assumption is $\sum_{i\sim j} \prob{A_j\mid A_i}$ is independent of $i$. This is usually true in many cases. We denote $\sum_{i\sim j} \prob{A_j\mid A_i} = \Delta^*$\footnote{Usually $ \sum_i\prob{A_i}\cdot\sum_{i\sim j} \prob{A_j\mid A_i} := \Delta$}. With this notation, $Var{X} \le \Exp\cdot(1+\Delta^*)$.
+	\begin{cor}
+	If $\Exp{X}	\To \infty$, $\Delta^* = o\rbk{\Exp{X}}$, then $\prob{X=0}\To 0$.
+	\end{cor}
+\end{enumerate}
+\section{$H$-free graphs}
+The general question we deal with is
+\begin{question}
+	Given a small graph $H$, what is the threshold function of $G\sim \Gg(n,p)$ containing $H$?
+\end{question}
+More formally:
+\begin{yellowBox}
+\begin{defn}
+	[Threshold Function] Let $G\sim \Gg(n,p)$ and $H$ some fixed small graph. We say $f(n)$ is a \emph{threshold function} for finding $H$ in $G$ if
+	\begin{align*}
+		& p\ll f(n) \Rightarrow \prob{G\text{ contains a copy of }H}\nim{n\to\infty}\To 0 \\
+		&{\text{\centering and}} \\
+		&p\gg f(n) \Rightarrow \prob{G\text{ contains a copy of }H}\nim{n\to\infty}\To 1 \\
+	\end{align*}
+\end{defn}	
+\end{yellowBox}
+We now explore some threshold functions
+\subsection{Triangles in $\Gg(n,p)$}
+We've shown that if $G\sim \Gg(n,p)$ and $p \ll \frac{1}{n}$ then $\prob{G\text{ contains a triangle}}\to 0$.
+\begin{claim}
+	If $p \gg \frac{1}{n}$ then $\prob{G\text{ contains a triangle}}\to 1$
+\end{claim}
+\begin{remark}
+In a case like this, we say that $\frac{1}{n}$ is the \emph{threshold function} for triangle existence in $\Gg(n,p)$.
+\end{remark}
+\begin{proof}
+	Denote by $X$ the number of triangles in $G$, then:
+	\[
+	\
+	\Exp{X} = {n\choose 3}p^3 = (1_o(1))\frac{n^3p^3}{6}\nim{p\gg \frac{1}{n}}\To\infty
+	\]
+	Denote by $T$ a triangle in $G$.
+	\[
+	\Delta^* = \sum_{T'\sim T}\prob{A_{T'}\mid A_T} \nim{\star}= 3\cdot(n-3)p^2\le 3np^2
+	\]
+	With $\star$ since any $T'$ dependent on $T$ is taken by choosing $2$ vertices in $T$ and a vertex not in $T$. Now we have
+	\[
+	\frac{\Delta^*}{\Exp{X}} \le \frac{18}{n^2p}\To 0
+	\]
+	And we are done.
+\end{proof}
+\begin{remark}
+In fact we've shown that $\frac{X}{\Exp{X}}\nim{\text{in probability}}\To 1$. This is some kind of law of large numbers. This can be seen by \autoref{thm:Chebyshev ineq}:
+\[
+\prob{|X-\Exp{X}> \varepsilon \Exp{X}}\le \frac{Var{X}}{\varepsilon^2\Exp{X}^2}\To 0
+\]
+\end{remark}
+
+\subsection{$K_4$ in $\Gg(n,p)$}
+Denote $X$ the number of $K_4$ copies in $G$. Then
+\[
+\Exp{X} = {n\choose 4}p^6 = \frac{1+o(1)}{24}n^4p^6
+\]
+Then if $p \ll n^{-2/3}$, $\prob{X = 0}\To 0$, and otherwise $\Exp{X}\to \infty$. Now denote by $S$ a fixed copy of $K_4$ in $G$. Then:
+\begin{flalign*}
+	\Delta^* = \sum_{S'\sim S}\prob{A_{S'}\mid A_S}\le \overbrace{6n^2p^5}^\text{Share $2$ vertices} + \overbrace{4np^3}^\text{Share $3$ vertices}
+\end{flalign*}
+Then
+\[
+\frac{\Delta^*}{\Exp{X}} \le O\rbk{\frac{1}{n^2p} + \frac{1}{n^3p^3}}\nim{p\gg n^{-2/3}}\To 0
+\]
+\subsection{$K_4*e$ in $\Gg(n,p)$}
+In this case
+\[
+\Exp{X} = 5{n\choose 5}p^7 = \frac{1+o(1)}{24} n^5p^7
+\]
+Then $p\ll n^{-5/7}$ implies $\prob{X > 0}\To 0$. Is it true that $p\gg n^{-5/7}$ implies $\prob{X = 0}\To 1$? Note that $n^{-5/7} \ll n^{-2/3}$, and since existence of $K_4*e$ implies existence of $K_4$, had $n^{-5/7}$ been the threshold, it would contradict our previous proof.
+\begin{yellowBox}
+\begin{defn}
+	[Maximal Subgraph Density] Given $H$, we define its maximal density by
+	\[
+	m(H) := \underset{\emptyset\neq A\subset V(H)}{\max} \frac{e(A)}{|A|}
+	\]
+\end{defn}	
+\begin{remark}
+	First moment argument shows that $p\ll n^{-\frac{1}{m(H)}}$.
+\end{remark}
+\end{yellowBox}
+\begin{thm}
+	[Threshold characterization]\label{thm: Threshold characterization} The threshold function of $H$ is $n^{-\frac{1}{m(H)}}$
+\end{thm}
+\section{Cliques in $\Gg(n,1/2)$}
+\begin{thm}
+	Let $G\sim \Gg(n,1/2)$. Denote $X =\text{size of maximal clique in $G$}$.  There exists $k = k(n)$ and $k = \Theta(2\log_2(n))$ such that 
+	\[
+	\prob{X\in \cbk{k,k+1}} \nim{n\to \infty}\To 1
+	\]
+\end{thm}
+\begin{proof}
+	[Proof (Sketch).] Define 
+	$f(k) = \Exp{\#\text{of $k$-cliques in $G$}} = {n\choose k}2^{-{k\choose 2}}$. We claim that if $f(k)\to \infty$ then there exists a clique of size $k$.
+	\[
+	\Delta^* =\sum_{i=2}^{k-1}{k\choose i}\cdot{n-k\choose k-i}\rbk{\frac{1}{2}}^{{k\choose 2}-{i\choose 2}}
+	\]
+	Now it can be shown that $k\sim 2\log_2(n$, if $f(k)\to \infty$ then $\frac{\Delta^*}{f(k)}\to 0$ by case analysis. We note that 
+	\[
+	\frac{f(k+1)}{f(k)} = \frac{{n\choose k+1}2^{-\frac{k(k+1)}{2}}}{{n\choose k}2^{-\frac{k(k-1)}{2}}} = \frac{n-k}{(k+1)}2^{-k}\approx 2^{-2\log_2(n)} < \frac{1}{n}
+	\]
+	We now consider a $k_0$ such that $f(k_0)\ge 1$ and $f(k_0+1) < 1$. If $f(k_0(n))$ tends to $\infty$ with $n$ and $f(k_0) = o(n)$, then $f((k_0+1)(n))\nim{n\to \infty}\To 0$. In this case, there exists a maximal $k_0$-clique, and no $(k_0+1)$-clique, so the maximal clique of $k_0$. A similar argument may show the result, but it's quite annoying. The book has the complete proof
+\end{proof}
+
+\section{Distinct Sums Problems}
+The \emph{Distinct Sums Problems} is a problem suggested by Erd\H{o}s\footnote{And it is still open with a $\$ 300 $ prize awaiting to the solver!}.
+
+\begin{problem}
+What is the maximal size of $S\subset [n]$ with distinct partial sums?	
+\end{problem}
+\begin{sol}[lower bound] Take $S = \{1,2,4,8,\ldots\}$, then $|S| = \log_2(n)$. 
+\end{sol}
+\begin{question}
+	Is $|S|\le \log_2(n) + o(1)$?
+\end{question}
+\begin{sol}
+[Upper bound] $2^{|S|}\le n\cdot |S|$
+\end{sol}
+\begin{cor}
+$|S| \le \log(n) + \log\log(n) + o(1)$
+\end{cor}
+\begin{claim}\footnote{This is worth $\$150 $!}
+$|S| \le \log(n) + 0.5\log\log(n) + o(1)$	
+\end{claim}
+
+\begin{proof}
+	Let $S = \{s_1\ldots s_m\}$ and consider a random partial sum $X = \sum_{i=1}^m b_is_i$ with $b_i\sim U(\{0,1\}$.
+	\[
+	\mu :=\Exp{X} =\sum_{i=1}^m\frac{s_i}{2}\quad\text{and}\quad  Var{X}\sum_{i=1}^m\frac{s_i^2}{4}
+	\]
+	Now try to bound the variation:
+	\begin{flalign*}
+		Var{X} = \frac{1}{4}\sum_{i=1}^ms_i^2\nim{s_i\le n}\le \frac{mn^2}{4}
+	\end{flalign*}
+	Then
+	\begin{flalign*}
+		& \prob{|x-\mu|\le \lambda}\nim{Chebyshev}\ge 1-\frac{mn^2}{4\lambda^2}\\
+		& \prob{|x-\mu|\le \lambda} \nim{\text{distinct sums}}\le (2\lambda + 2)2^{-m}
+	\end{flalign*}
+	So
+	\begin{flalign*}
+		 & (2\lambda + 2)2^{-m} \ge 1-\frac{mn^2}{4\lambda^2}\qquad \nim{\text{Take }\lambda = \sqrt{3}\sqrt{m}n}\iff\\
+		 &c\sqrt{m}n2^{-m}\ge\frac{4}{c'mn^2} \geq \frac{11}{12}
+	\end{flalign*}
+	Therefore $2^{m}\le \tilde{C}\sqrt{m	}n$ And some computations result in the bound.
+\end{proof}
+
+\section{Hardy- Ramanujan Thoerem}
+The question we deal with is "how many prime numbers divide a random number $\sim U([n])$? 
+\begin{thm}
+	[Hardy- Ramanujan]\label{thm:Hardy- Ramanujan}
+	For $x\in \NN$ let $\nu(x)$ be the number of prime divisors of $x$ (without multiplicity). If $x\in U([n])$, then for a large enough $n$,
+	\[
+	\forall\varepsilon > 0 \quad \exists A>0 \quad \prob{\abs{\nu(x) - \log\log n} > A\sqrt{\log\log n}} < \varepsilon
+	\]
+\end{thm}
+\begin{thm}
+	[Erd\H{o}s-Kac]\label{thm: Erdos-Kac}
+	With the same notations,
+	\[
+	\frac{\nu(x) - \log\log n}{\sqrt{\log\log n}}\nim{\Dd}\To \Nn(0,1)
+	\]
+\end{thm}
+\begin{thm}
+	[Merten]\label{thm:Merten} $\sum_{p\le m} \frac{1}{p} = \log\log M = O(1)$
+\end{thm}
+\begin{proof}
+	[Proof(of\autoref{thm:Hardy- Ramanujan}).] Denote by $X(x)$ the amount of prime divisors of $x$ not greater then $n^{1/10}$. Clearly $X\le \nu$. Since there cannot be more than $10$ divisors larger than $n^{1/10}$\footnote{Let $m$ be the number of divisors larger than $n^{1/10}$, then $x$ is at least $n^{m/10}\le x\le n$.}, we have $\nu - 10 \le X$. Denote $\chi_p \one_{p\mid x}$. Then:
+	\begin{flalign*}
+		&X = \sum_ {p\le n^{1/10} } \chi_p\quad \text{ and }\quad  \Exp{\chi_p} = \frac{\Floor{\frac{n}{p}}}{n} = \frac{1}{p} + O(1/n)\Rightarrow \\
+		&\Exp{X} = \sum_{p\le n^{1/10}} \frac{1}{p} + O(1) \nim{\text{\autoref{thm:Merten}}}=\log\log n + O(1) 
+	\end{flalign*}
+	Now we calculate the $\Delta^*$ part. For any $p,q$ primes, we have $\prob{\chi_p\cdot\chi_q} = \frac{\Floor{\frac{n}{pq}}}{n}$ (by the Chinese Reminder Theorem), therefore:
+	\begin{flalign*}
+		cov(\chi_p,\chi_q) = \Exp{\chi_p\chi_q} - \Exp{\chi_p}\Exp{\chi_p} =\frac{\Floor{\frac{n}{pq}}}{n} - \frac{\Floor{\frac{n}{p}}}{n}\frac{\Floor{\frac{n}{q}}}{n} = \frac{1}{pq} - \rbk{\frac{1}{p}-\frac{1}{n}}\rbk{\frac{1}{q}-\frac{1}{n}}\le \frac{1}{n}\rbk{\frac{1}{p} + \frac{1}{q}}
+	\end{flalign*}
+	So
+\begin{flalign*}
+	& Var{X} = \sum_p Var{\chi_p} + \sum_{p\neq q} cov{\chi_p,\chi_q} \le \log\log n + O(1) + \sum_{p\neq q}\frac{1}{n}\rbk{\frac{1}{p} + \frac{1}{q}} \le \\
+	& \log\log n + O(1) +(n^{1/10})^2\frac{1}{n} = \log\log n + o(1)
+\end{flalign*}
+So the result follows from Chebyshev.
+\end{proof}
+\section{The R\"{o}de Nibble}
+The question deals with the existence of designs.
+\begin{yellowBox}
+\begin{defn}
+	[$(n,k,r)$ - design]: An $(n,k,r)$ - design is a $k$-graph over $n$ vertices such that any $r$-set of vertices is contained exactly in one edge. 
+\end{defn}	
+\end{yellowBox}
+\begin{example}
+	$k=2, r=1$ means a perfect matching. 
+\end{example}
+\begin{question}
+	Is is true that for any $r < k \ll n$ there exists a corresponding design?
+\end{question}
+Of course not! Take an odd $n$, one cannot find a perfect matching in a graph over an odd number of vertices. We get division requirements: Denote by $e$ the number of edges in a design. Then
+\[
+e\cdot{k\choose r} = {n\choose r} \Rightarrow {k\choose r}\mid {n\choose r}
+\]
+
+\begin{yellowBox}
+\begin{defn}
+	The Complementary design with respect to $A\subset [n]$ with $|A| < r$ is with the edges
+	\[
+	E_A = \cbk{e\setminus A\mid A\subset e \in E}
+	\]
+\end{defn}
+\end{yellowBox}
+\subsection{Approximations}
+\begin{yellowBox}
+\begin{defn}
+	[Covering] a covering is a relaxation of designs, when we demand that any $r$-tuple is contained in \emph{at least} one edge
+\end{defn}	
+\begin{defn}
+	[Packing] a covering is a relaxation of designs, when we demand that any $r$-tuple is contained in \emph{at most} one edge
+\end{defn}	
+\end{yellowBox}
+\begin{remark}
+	In theres cases, clearly $|E| \ge \frac{{n\choose r}}{{k\choose r}}$ and $|E| \le \frac{{n\choose r}}{{k\choose r}}$ respectively.
+\end{remark}
+The \emph{Erd\H{o}s Hananni conjecture} is that for any $k,r$, when $n\to\infty$ there exists a covering of size\footnote{In the sense of $|E|$} $(1+o(1))\frac{{n\choose r}}{{k\choose r}}$. This is equivalent of having a packing of size $(1-o(1))\frac{{n\choose r}}{{k\choose r}}$. This conjecture was proved by using the \emph{R\"ode Nibble}.
+\begin{proof}
+	[Proof (for the case $r=2,k=3$)]\footnote{Steiner Triplet systems} We look for a collection of $(1+o(1))\frac{{n\choose 2}}{3}$ triplets that cover all edges. Had we tried to choose any triangle independently with probability $1/n$, we would have failed miserably: \[
+	\prob{\text{A specific edge is not covered}} = \rbk{1-1/n}^{n-2}\approx \frac{1}{e}
+	\]
+	Which means that this method "misses" a constant amount of edges!\\
+	We try to choose any trianegl with probability $\frac{\varepsilon}{n}$, which results in approximately $\frac{\varepsilon n^2}{6}$ triangles. Then:
+	\[
+		\prob{\text{A specific edge is not covered}} = \rbk{1-1/n}^{n-2}\approx \frac{1}{e^\varepsilon}
+	\]
+	So
+	\[
+	\prob{\text{a specific edge is covered}} \approx 1-e^{-\varepsilon} \approx\varepsilon - \frac{\varepsilon^2}{2}\ldots
+	\]
+\end{proof}
+\begin{defn}
+	[Typical Graph] A graph with $m$ edges is called ($D,\delta,k)$-\emph{Typical} if:
+	\begin{enumerate}
+		\item Aside from $\delta\cdot m$ edges, all edge is contained in $D(1\pm\delta)$ triangles. 
+		\item Any edge is contained in at most $kD$ triangles.
+	\end{enumerate}
+\end{defn}
+\begin{lemma}
+	For any $\varepsilon > 0$, large enough $D$, $k$ and $\delta>0$, there exsists $\gamma > 0$ such that in any $(D,\delta,k)$ typical graph there is a collection of $\frac{\varepsilon}{3}(m\pm \gamma)$ triangles, denoted $T$ such that $G\setminus T$ is a graph with $m\cdot e^{-\varepsilon}(1\pm \gamma)$ edges, and is $(De^{-2\varepsilon},\gamma,ke^{2\varepsilon})$-typical
+\end{lemma}
+\begin{proof}
+	We sample each triangle i.i.d with probability $\frac{\varepsilon}{D}$. The number of triangles in the graph is at least $\frac{(1-\delta)mD(1-\delta)}{3} = \frac{mD}{3}(1-\delta_1)$, and at most $\frac{\delta mkD + (1-\delta )mD(1+\delta)}{3} = \frac{mD}{3}(1+\delta_1)$. Let $T$ be the number of triangles. Then $T\sim \Bin{\frac{mD}{3}(1\pm \delta_1),\frac{\varepsilon}{D}}$ and the first item in the definition is gained by first moment argument.\\
+	Let $X_e$ be the indicator of the event "e is not covered". Then if $d_e = D(1\pm \delta)$\footnote{The number of triangles containing $e$}, we get
+	\[
+	\Exp{X_e} = \rbk{1-\frac{\varepsilon}{D}}^{D(1\pm\delta)} = e^{-\varepsilon}(1+\delta_1)
+	\] Let $X = \sum_{e} X_e$, then $\Exp{X} = me^{-\varepsilon}(1-\delta_1)$ and 
+	\begin{align*}
+		&cov{X_e,X_{e'}} = \prob{\text{both not covered}} - \prob{e\text{ is not covered}}\prob{e'\text{ is not covered}} \\
+		& \rbk{1-\frac{\varepsilon}{D}}^{d_e+d_{e'}-1} -  \rbk{1-\frac{\varepsilon}{D}}^{d_e} \rbk{1-\frac{\varepsilon}{D}}^{d_{e'}} \le \frac{\varepsilon}{D}
+	\end{align*}
+	Then
+	\begin{align*}
+		&Var{X} \le me^{-\varepsilon}(1\pm \delta_1) + mD(1+\delta)2\frac{\varepsilon}{D} = O(m)
+	\end{align*}
+	Then by Chebyshev, $\prob{\text{The number of edges}\notin me^{-\varepsilon}(1\pm \delta_2) < 0.01} \to 0$. It is left to show that $G\setminus T$ is typical. 
+	\begin{claim}
+		Other than $\delta_1m$ edges, all edges are both good and contained in $(1\pm \delta_1)D$ triangles whose edges are good.
+	\end{claim}
+	\begin{proof}
+	\begin{flalign*}
+		& \Exp{d_e(G\setminus T)} = (1\pm \delta_1)De^{-2\varepsilon}(1\pm \delta_1)^2\\
+		& Var{d_e(G\setminus T)} \le \Exp{d_e(G\setminus T)} + D^2\frac{\varepsilon}{D} = O(D)
+	\end{flalign*}
+	Wo once again, Chebyshev we are done.
+	\end{proof}
+
+\end{proof}
+
+\begin{proof}
+	[Proof (R\"ode's Nibble - general case).] Denote $p = e^{-\varepsilon}$Let $G_0 = K_n$. Let $G_{i+1}$ be obtained from $G_i$ by removing each triangle with probability $\frac{\varepsilon}{p^{2i}D}$ .Then $|E(G_i)| \approx p^i{n\choose 2}$: With this step we've chosen $$\approx \frac{\varepsilon}{p^{2i}D}\cdot \overbrace{p^i{n\choose 2}}^{|E(G_i)|}\cdot  \overbrace{\frac{p^{2i}n}{3}}^{\text{\# $\triangle$ in typical edge}} = \varepsilon p^i\frac{n^2}{6}$$
+	Hence the number of triangles in the cover is
+	\[
+	p^t{n\choose 2} + \sum_{i=0}^{t-1}\varepsilon p^i\frac{n^2}{6} \le \frac{n^2}{6}\rbk{3e^{-\varepsilon t} + \varepsilon\frac{1}{1-e^{-\varepsilon}}} = \star
+	\]
+	So when $\varepsilon\to 0$, we can choose a large enough $t$, we may have $\star \le (1+\delta)\frac{n^2}{6}$. The thing is - we've hidden all the error terms, but this can be dealt with. Super annoyingly.
+\end{proof}
+
+\chapter{Lov\'asz's Local Lemma}
+Up to this point we used probability to find an object of interest with high probability.  The \emph{Local Lemma} is a tool to prove an object's existence even if the probability of finding them is small - even exponentially. In fact, this is an \emph{algorithmic} approach.
+\begin{yellowBox}
+\begin{lemma}
+	[The local Lemma, Symmetric]\label{Local Lemma} Let $(A_i)_{i\in [n]}$ be events such that:
+	\begin{enumerate}
+  \item  $A_i$ is independent in all $A_j$, except for at most $d$ of them\footnote{Not in pairs! $A_i$ is dependent on the event $\cup_{j\in K} A_j$ for some $K\in {[n]\setminus i\choose d}$}
+	\item $\prob{A_i} \le p$
+	\item $ep(d+1)\le 1$
+\end{enumerate}
+Then $\prob{\cap_{i\in [n]}\overline{A_i}} > 0$
+\end{lemma}	
+\end{yellowBox}
+\subsection{Results from the lemma}
+\begin{thm}
+	[Improvement on \autoref{thm:Ramsey}] If $e\cdot 2^{1-{k\choose 2}}\rbk{{k\choose 2}{n\choose k-2} + 1}<1$, then $R(k,k) > n$
+\end{thm}
+\begin{proof}
+	Let $G\sim \Gg(n,1/2)$. For any $S\in {[n]\choose k}$, denote $A_S$ the even that $S$ is a clique or an anti-clique. We know that $\prob{A_S} = 2^{1-{k\choose 2}}$. Note that $A_S$ is independent in all  $A_M$ other than at most $ {k\choose 2}{n\choose k-2}$. Then by the \autoref{Local Lemma} - there exists a graph in which no $A_S$ occures. 
+\end{proof}
+\begin{exercise}
+Consider a $k$-SAT in which any variable appears in at most $r$ clauses ($k>3r$). Show a polynomial algorithm to decide satisfyability.
+\end{exercise}
+
+\end{document}

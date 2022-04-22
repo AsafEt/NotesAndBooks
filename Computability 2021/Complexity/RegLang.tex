@@ -1,0 +1,850 @@
+\chapter{Regular languages}
+A finite automata is a finite state machine, designed to formalize the idea of "legal sequences of commands". To define an automata we would need some notion of commands, and a way to describe transitions between commands - in a way that captures (in)validity of a given sequence of commands.
+\section{Finite Automata}
+\begin{yellowBox}
+	\begin{defn}[Alphabet] An \textbf{Alphabet} denoted by $\Sigma$ is a finite set of letters $\Sigma = \{\sigma_1, \sigma_2\ldots \sigma_n\}$
+	\end{defn}
+\end{yellowBox}
+\begin{example} Some alphabet:
+	\begin{itemize}
+		\item $\Sigma = \{0,1\}$
+		\item $ \Sigma = \{\text{On, Off, U,D,L,R}\}$
+	\end{itemize}
+\end{example}
+\begin{yellowBox}
+	\begin{defn}[Word, Empty Word] A \textbf{Word} is a finite sequence of letters from a given alphabet. Denote the \textbf{Empty word} by $\varepsilon$. Denote the collection of all words over $\Sigma$ by $\Sigma^*$, and note that $|\Sigma^*| = \aleph_0$ when $\Sigma$ is finite.
+	\end{defn}
+	\begin{defn}[Language] A \textbf{Language} is a subset of words $\Ll\subset \Sigma^*$ (we do not distinguish proper and improper inclusion).
+	\end{defn}
+	\begin{defn}[Finite Automaton] A \textbf{Finite Automaton} consists of $5$ items: $(Q,\Sigma, \delta, q_0, F)$, with:
+		\begin{itemize}
+			\item $Q$ state set.
+			\item $\Sigma$ alphabet.
+			\item $\delta: Q\times \Sigma \To Q$ transition function.
+			\item $q_0\in Q$ initial state.
+			\item $F\subset Q$ subset of accepting states.
+		\end{itemize}
+	\end{defn}
+\end{yellowBox}
+\begin{example}
+	Define: $\Sigma = \{0,1\}$, $Q = \{q_0, q_1\}$:
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q_0)   {$q_0$};
+			\node[state] (q_1) at (2,0) {$q_1$};
+			
+			
+			\path[-stealth, thick]
+			(q_0) edge [bend left] node{0} (q_1)
+			edge [loop above] node{1} (q_0)
+			(q_1) edge [bend left] node{0} (q_0)
+			edge [loop above] node{1} (q_1);
+		\end{tikzpicture}
+		\caption{Simple Automaton}
+	\end{figure}
+	Note that here $\delta$ is implied, and that $F = \emptyset$. We may define $F = \{q_0\}$, and get the automaton:
+	\begin{figure}[ht]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial, accepting] (q_0)   {$q_0$};
+			\node[state] (q_1) at (2,0) {$q_1$};
+			
+			
+			\path[-stealth, thick]
+			(q_0) edge [bend left] node{0} (q_1)
+			edge [loop above] node{1} (q_0)
+			(q_1) edge [bend left] node{0} (q_0)
+			edge [loop above] node{1} (q_1);
+		\end{tikzpicture}
+		\caption{Simple Automaton with accepting state} 
+	\end{figure}
+\end{example}
+\begin{yellowBox}
+	
+	\begin{defn}[A Run on Automaton] Let $\Aa$ be an automaton and $w = (w_i)_{i=1}^n\in \Sigma^*$ a word. A \textbf{Run} $R$ on $A$ is a sequence of states $R = (r_i)_{i=0}^{n}\in Q$ such that $r_0 = q_0$ and
+		\begin{flalign*}
+			\forall 0\leq i \leq n-1 \qquad r_{i+1} = \delta(r_i, w_{i+1})
+		\end{flalign*}
+		That is -$R$ behaves according to $\delta$ ($R$ respects $\delta$).
+	\end{defn}
+	\begin{defn}[Accepting Run]
+		We say a run $R$ is \textbf{accepting} if $r_n\in F$
+	\end{defn}
+\end{yellowBox}
+\begin{example}
+	Recall the previous automaton with the word $1101$, we get the run $$q_0\nim{1}\to q_0\nim{1}\to q_0\nim{0}\to q_1\nim{1}\to q_1$$ Which is not accepting. Conversely -  The run on $0101$ is:
+	$$q_0\nim{0}\to q_1 \nim{1}\to q_1\nim{0}\to q_0 \nim{1}\to q_0$$
+	Which is accepting, because $q_0\in F$.
+\end{example}
+\begin{yellowBox}
+	\begin{defn}[Accepting a word - deterministic] We say an automaton $\Aa$ \textbf{Accepts} a word $w$ if the (single) run $R$ on $w$ is accepting
+	\end{defn}
+	\begin{defn}[Language of Automaton] The \textbf{Language of Automaton} $\Aa$ is:
+		$$\Ll(\Aa) = \{w \mid \Aa \text{ Accepts } w\}$$
+	\end{defn}
+\end{yellowBox}
+\begin{example}
+	For the previous automaton $\Aa$, we have $\Ll(\Aa) = \{w\mid \text{the number of $0$s in $w$ is even}\}$. Note that this is not a proof, but a claim. We will see later how to prove these claims (in various ways).
+\end{example}
+\begin{remark}
+	Until now, we demanded that $\delta$ is defined for any $q\in Q, \sigma\in \Sigma$ (that is, $A$ is \textbf{complete}). We could ignore this demand, and assume that for an incomplete automata - we could extend the incomplete $\delta$ to a complete one by introducing a \textbf{Rejecting Sink} $q_{rej}\in Q\setminus F$ and extend $\delta$ accordingly.
+\end{remark}
+\begin{example} Consider the following automaton
+	\begin{figure}[ht]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q_1)   {$q_1$};
+			\node[state, accepting] (q_2) at (2,0) {$q_2$};
+			\node[state] (q_3) at (4,0) {$q_3$};
+			
+			\path[-stealth, thick]
+			(q_1) edge [loop above] node{0} (q_1)
+			edge [ bend left] node{1} (q_2)
+			(q_2) edge[loop above] node{1} (q_2)
+			edge[bend left] node{0} (q_3)
+			(q_3)		edge [bend left]node{0,1} (q_2)
+			;
+		\end{tikzpicture}
+		\caption{Example Automaton $\Aa$} 
+	\end{figure}
+	What is $\Ll(\Aa)$? Check a few words:
+	\begin{itemize}
+		\item $000$ is not accepted
+		\item $00010$ is not accepted
+		\item $01101$ is accepted
+	\end{itemize}
+	The language is $$L(A) = \{w\mid \text{There is at least one $1$, and after the last $1$ there is an even number of $0$}\}$$
+\end{example}
+\begin{example} Consider the following language:
+	$$
+	\Ll_2 = \{w\in \{0,1\}^* \mid \text{$w$ contains $001$}\}
+	$$
+	We design the automaton:
+	
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q0)   {$q_0$};
+			\node[state] (q1) at (2,0) {$q_1$};
+			\node[state] (q2) at (4,0) {$q_2$};
+			\node[state, accepting] (qacc) at (6,0) {$q_3$};
+			
+			\path[-stealth, thick]
+			(q0) edge [loop above] node{1} (q0)
+			edge [bend left] node{0} (q1)
+			(q1) edge[bend left] node{1} (q0)
+			edge [bend left] node{0} (q2)
+			(q2) edge[bend left] node{1} (qacc)
+			edge [loop above] node{0} (q2)
+			
+			(qacc) edge [loop above] node{0,1} (qacc);
+		\end{tikzpicture}
+		\caption{Automaton for $\Ll_2$}
+	\end{figure}
+	
+\end{example}
+\newpage
+\begin{example}
+	We extend the last example, define:
+	$$ \Ll_n = \{w\mid \text{$w$ contains $0^n 1$}\} $$
+	A fitting automaton would be:
+	
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q0)   {$q_0$};
+			\node[state] (q1) at (2,0) {$q_1$};
+			\node[state] (q2) at (4,0) {$q_2$};
+			\node (q) at (6,0) {$\ldots$};
+			\node [state] (qn) at (8,0) {$q_{n-1}$};
+			\node[state, accepting] (qacc) at (8,2) {$q_n$};
+			
+			\path[-stealth, thick]
+			(q0) edge [loop above] node{1} (q0)
+			edge [bend left] node{0} (q1)
+			(q1) edge[bend left] node{1} (q0)
+			edge [bend left] node{0} (q2)
+			(q2) edge[bend left] node{0} (q)
+			edge [bend left, out = 45, in = 120] node{1} (q0)
+			(q) edge[bend left] node{0} (qn)
+			
+			(qn) edge[bend right, swap] node{1} (qacc)
+			edge [loop below] node{0} (qn)
+			(qacc) edge [loop above] node{0,1} (qacc);
+		\end{tikzpicture}
+		\caption{Automaton for $\Ll_n$}
+	\end{figure}
+\end{example}
+\begin{yellowBox}
+	\begin{defn}[$\delta^*$]: Given an automaton $\Aa$, we recursively define $\delta^*: Q\times \Sigma^* \to Q$:
+		\begin{flalign*}
+			\delta^*(Q,w) = \begin{cases} \delta(q,w) & |w| = 1,0 \\
+				\delta\left(\delta^*(q,w'), \sigma\right) & w = w'\cdot \sigma
+			\end{cases}
+		\end{flalign*}
+	\end{defn}
+\end{yellowBox}
+\subsection{Deterministic Automata}
+Until now, we've designed automata for a given language. The natural question rises - is there an automaton for any language $L$? The answer is no, but it is not clear how to prove such a thing. At this point, let us define a language that is recognized by an automaton:
+\begin{yellowBox}
+	\begin{defn}[Regular Language] We say $L\subset \Sigma^*$ is \textbf{Regular} if there exists an automaton $\Aa$ over $\Sigma$ such that 
+		$\Ll = \Ll(\Aa)$. We denote the class of all regular languages \textbf{\Reg}.
+	\end{defn}
+\end{yellowBox}
+
+\subsection{Operations on Languages}
+Since any language $\Ll$ is a set, we may define some set operations on two languages $\Ll_1, \Ll_2$ - like union and intersection. But we can also define operations that use the concrete properties of languages.
+\begin{remark}
+	We may always assume that $\Ll_1, \Ll_2$ are over the same $\Sigma = \Sigma_1 \cup \Sigma_2$.
+\end{remark}
+\begin{yellowBox}
+	\begin{defn}[Concatenation] We define the \textbf{Concatenation of 
+			$\Ll_1$ to $\Ll_2$} as
+		$$ \Ll_1 \cdot \Ll_2 = \{w_1 \cdot w_2 \mid w_i\in \Ll_i \text{ for } i=1,2\}$$
+		Note that this operation is not commutative.
+	\end{defn}
+	\begin{defn}
+		[Star] For a language $L$ define the \textbf{Star} operator as:
+		$$ \Ll^* = \{ w_1 \cdot w_2 \cdot \ldots \cdot w_k \mid k\geq 0, \forall i\leq k \quad w_i\in \Ll \}$$
+	\end{defn}
+\end{yellowBox}
+\begin{remark}
+	Note that always $\varepsilon\in L^*$, and that $\Sigma^*$ is a special case of this operation.
+\end{remark}
+\begin{yellowBox}
+	
+	\begin{defn}
+		[Complement] The \textbf{Complement} of $L$ is:
+		$$ \Ll^c = \overline{\Ll} = \Sigma^* \setminus \Ll$$
+	\end{defn}
+\end{yellowBox}
+\begin{example}
+	Let $\Ll_1 = \{1, 333\},\quad \Ll_2 = \{22,4444\}$. Then:
+	\begin{itemize}
+		\item $\Ll_1 \cup \Ll_2 = \{1,333,22,4444\}$
+		\item $\Ll_1 \cdot \Ll_2 = \{122,14444,33322,3334444\}$
+		\item $\Ll_2 \cdot \Ll_1 = \{221,22333,44441,4444333\}$
+		\item $\Ll_1^*$ is an infinite set (countable).
+	\end{itemize}
+\end{example}
+\subsection{Closure properties of regular languages}
+The natural question rises - if $\Ll_1, \Ll_2$ are regular, then which operations maintain the regularity property?
+\begin{blueBox}
+	\begin{thm}
+		If $\Ll_1, \Ll_2$ are regular, then $\Ll := \Ll_1\cup \Ll_2$ is also regular.
+	\end{thm}
+\end{blueBox}
+\begin{proof}
+	Let $\Aa_i = (Q_1, \Sigma, \delta_1, s_1, F_1)$ ($i=1,2$) such that $\Ll(\Aa_i) = \Ll_i$, we will construct $\Aa = (Q,\Sigma, \delta, s_0, F)$ such that $\Ll(\Aa) = \Ll_1 \cup \Ll_2$. As always - we assume that $\delta_1,\delta_2$ are complete. Define $\Aa$ as the following (\textbf{product automaton}):
+	\begin{flalign*}
+		& Q = Q_1\times Q_2, \quad s_0 = (s_1, s_2)\\
+		& \delta\left((q_1, q_2),\sigma)\right) = \left(\delta_1(q_1,\sigma), \delta_2(q_2,\sigma)\right)\\
+		& F = \{(q_1, q_2) \mid q_1 \in F_1 \vee q_2\in F_2\} = (F_1\times Q_2 ) \cup (Q_1\times F_2)
+	\end{flalign*}
+	Consider a run of $\Aa$ on a word $w$ with $|w| =n$, denoted $R = q^0\ldots q^n$, that is:
+	\begin{flalign*}
+		& q^0,\ldots q^n = (q_1^0, q_2^0),(q_1^1, q_2^1),\ldots (q_1^n, q_2^n)
+	\end{flalign*}
+	with transitions according to $\delta$. By definition of $\delta$, we have $q_1^i = \delta_1(q^{i-1}_1,w_i)$ and similarly for $q_2^i$. Thus, the run $R$ defines two runs $R_1 = (q_1^i)_{i=0}^n, R_2=(q_2^i)_{i=0}^n$ on $\Aa_1, \Aa_2$ for the word $w$ (the converse claim also holds). The run $R$ is accepting iff:
+	\begin{flalign*}
+		q^n \in F \iff (q_1^n,q_2^n)\in F \iff \left(q_1^n\in F_1 \vee q_2^n \in F_2\right)
+	\end{flalign*}
+	that is - iff $R_1$ is accepting or $R_2$ is accepting. By definition, we have then $\Ll(\Aa) = \Ll_1 \cup \Ll_2$
+\end{proof}
+\begin{example}
+	Consider $\Sigma = \{a\}$ and define $\Ll_1 = \{w \mid |w| \mod 2 = 0\}$ and $\Ll_2 = \{w \mid  |w| \mod 2 = 1\}$, then:
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial, accepting] (q_0)   {$s_1$};
+			\node[state] (q_1) at (2,0) {$q_1$};
+			
+			
+			\path[-stealth, thick]
+			(q_0) edge [bend left] node{$a$} (q_1)
+			(q_1) edge [bend left] node{$a$} (q_0);
+		\end{tikzpicture}
+		\caption{$\Aa_1$ Automaton for $\Ll_1$}
+	\end{figure}
+	
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q_0)   {$s_2$};
+			\node[state, accepting] (q_1) at (2,0) {$q_2$};
+			
+			
+			\path[-stealth, thick]
+			(q_0) edge [bend left] node{$a$} (q_1)
+			(q_1) edge [bend left] node{$a$} (q_0);
+		\end{tikzpicture}
+		\caption{$\Aa_2$ Automaton for $\Ll_2$}
+	\end{figure}
+	Then the product automaton is:
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial, accepting] (q_0)   {$(s_1, s_2)$};
+			\node[state, accepting] (q_1) at (4,0) {$(q_1, q_2)$};
+			
+			
+			\path[-stealth, thick]
+			(q_0) edge [bend left] node{$a$} (q_1)
+			(q_1) edge [bend left] node{$a$} (q_0);
+		\end{tikzpicture}
+		\caption{Automaton for $\Ll_1 \cup \Ll_2$: The product automaton of $\Aa_1$ and $\Aa_2$}
+	\end{figure}
+	Note that we only drew the \textbf{reachable} states in this automaton. Formally, the state $(s_1, q_2)$ is a part of the automaton, but cannot be reached by any run on a given word (accepted or not). For simplicity - we omit unreachable states.
+\end{example}
+\begin{blueBox}
+	\begin{thm}
+		$\Reg$ is closed under complementation, that is $\Ll\in \Reg \Longrightarrow \Ll^c\in \Reg$.
+	\end{thm}
+	\begin{thm}
+		$\Reg$ is closed under intersection, that is $\Ll_1, \Ll_2\in \Reg \Longrightarrow \Ll_1 \cap \Ll_2 \in \Reg$.
+	\end{thm}
+\end{blueBox}
+\begin{proof}
+	\begin{mythrm}
+		[Complementation:] Let $\Ll$ be a regular language, and $\Aa = \left(\Sigma, Q,F, \delta, q_0\right)$ an automaton with $\Ll(\Aa) = \Ll$. Define the automaton $\overline{\Aa}$ the same as $\Aa$, but with $F_{\overline{\Aa}} = Q\setminus F = \overline{F}$. Thus:
+		\begin{flalign*}
+			w\in \Ll(\overline{\Aa}) \iff \delta^*(q_0,w)\in \overline{F} \iff \delta^*(q_0,w)\notin F \iff w\notin \Ll(\Aa) \iff w\in \overline{\Ll(\Aa)} = \overline{\Ll}
+		\end{flalign*}
+		That is, by definition, $\Ll(\overline{\Aa}) = \overline{\Ll}$ thus $\overline{\Ll}\in \Reg$. 	
+	\end{mythrm}
+	\begin{mythrm}
+		[Intersection:] Let $\Ll_1, \Ll_2\in \Reg$. By the previous theorem - $\overline{\Ll_1}, \overline{\Ll_2}\in \Reg$. We proved that $\Reg$ is closed under union, so $\overline{\Ll_1} \cup \overline{\Ll_2}\in \Reg$, and once again by the previous theorem - $\overline{\overline{\Ll_1} \cup \overline{\Ll_2}} = \Ll_1\cap \Ll_2\in \Reg$ with the equality by de-Morgan's law. Thus $\Reg$ is closed under intersection.
+	\end{mythrm}
+\end{proof}
+We would like now to show that $\Reg$ is closed under concatenation. This is not a trivial fact - in order to prove this, we will introduce a new concept.
+\section{Nondeterminism}
+Un until now, any $DFA$ was, as the name suggests - deterministic. We will extend our discussion to the idea of non-deterministic automata. That is - for a tuple $(q,\sigma)$ more than one transition is possible (more than one edge in the automaton graph) and in particular - edges $(q_1,\varepsilon) \to (q_2, \varepsilon)$ - "hops" between states, without reading anything.
+\subsection{Nondeterministic Automata}
+\begin{yellowBox}
+	\begin{defn}
+		[Nondeterministic finite automaton] a \textbf{Nondeterministic Finite Automaton (NFA)} $\Aa$ is a 5-tuple $\left(Q,\Sigma, \delta, Q_0, F\right)$ such that:
+		\begin{itemize}
+			\item $Q,\Sigma, F$ as in DFA.
+			\item $Q_0\subset Q$ is a set of initial states
+			\item $\delta: Q\times \left(\Sigma \cup \{\varepsilon\}\right) \to 2^Q$ 
+		\end{itemize}
+		\begin{remark}
+			Any DFA is a private case of NFA.
+		\end{remark}
+	\end{defn}
+\end{yellowBox}
+\begin{remark}
+	The "non-determinism" is captured by three facts:
+	\begin{itemize}
+		\item There may be more than one run for a word $w$ on $\Aa$!
+		\item There are $\varepsilon$ transitions ("jumps")
+		\item There are multiple initial states
+	\end{itemize}
+\end{remark}
+\begin{yellowBox}
+	
+	\begin{defn}[$\delta^*$]
+		We extend $\delta$ to $\delta^* :2^Q \times \Sigma^* \to 2^Q$ as $$\delta^*(S,w) = \{\text{all states that are reachable by reading $w$ from $S$}\}$$ Formally we can compute $\delta^*$ inductively, starting from $w = \varepsilon$, then $|w| = 1$ and so on.
+	\end{defn}
+\end{yellowBox}
+\begin{example} Consider the following nondeterminisim automaton
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q0)   {$q_0$};
+			\node[state] (q1) at (2,0) {$q_1$};
+			\node[state] (q2) at (4,0) {$q_2$};
+			\node[state, accepting] (q3) at (6,0) {$q_3$};
+			
+			\path[-stealth, thick]
+			(q0) edge [loop above] node{1,0} (q0)
+			edge [bend left] node{1} (q1)
+			(q1) edge [bend left] node{0, $\varepsilon$} (q2)
+			(q2) edge[bend left] node{1} (q3)
+			
+			;
+		\end{tikzpicture}
+		\caption{Nondeterministic Automaton} \label{fig:M1}
+	\end{figure}
+\end{example}
+\begin{yellowBox}
+	\begin{defn}[Accepting run on NFA]
+		Given an NFA $\Aa$, we say that $w\in \Ll(\Aa)$ if \textbf{there exists} a run $R = (r_i)_{i=1}^k$ of $w$ on $\Aa$ such that $r_n\in F$.
+	\end{defn}
+\end{yellowBox}
+\begin{example}
+	Consider the previous automaton, then $\Ll(\Aa) = \{\text{any word that contains $11$ or $101$}\}$. Once again - no formal proof here. AN important note - consider the word $11$. The run $(q_0,q_1)$ - it does not end in $Q_0$, but another run $(q_0,q_1,q_2,q_3)$ is still valid - by using the $\varepsilon$ transition, and this is an accepting run, so $11\in \Ll(\Aa)$.
+\end{example}
+\subsection{Equivalence of NFAs and DFAs}
+\subsubsection*{Removing $\varepsilon$ transitions}
+\begin{claim}
+	Let $\Aa$ be an NFA, there exists an equivalent NFA $\Aa'$ with no $\varepsilon$ transitions.
+\end{claim}
+\begin{proof}
+	Idea: For $q\in Q$ define 
+	$$E_q = \{q'\in Q \mid \text{$q'$ is reachable from $q$ via $\varepsilon$ transitions}\}$$
+	Define $\Aa'$ the following way:
+	\begin{itemize}
+		\item $Q_0' = \bigcup_{q\in Q_0}E_q$
+		\item $\delta'(q,\sigma) = \bigcup_{s\in \delta(q,\sigma)}E_s$
+	\end{itemize}
+\end{proof}
+\subsubsection*{Regulatity} 
+As in DFA, we would like to understand for what languages $\Ll$ there exists an NFA $\Aa$ such that $\Ll(\Aa) = \Ll$. The surprising answer is that this class is exactly $\Reg$.
+\begin{blueBox}
+	\begin{thm}[DFAs and NFAs Equivalence, Rabin and Scott 1959]
+		For any NFA $\Aa$ there exists a DFA $\Aa'$ such that $\Ll(\Aa) = \Ll(\Aa')$.
+	\end{thm}
+\end{blueBox}
+\begin{remark}
+	This means that for this computational model - nondeterminism gives no additional computational strength. This is not the case for all computational models, as we'll see later in the course.
+\end{remark}
+
+\begin{proof}
+	Let $\Aa$ be an NFA. The idea would be to build a DFA $\Aa'$ (note its transition function $\rho$) to emulate any possible run of $\Aa$, and show $\Ll(\Aa) = \Ll(\Aa')$. We define $Q' = 2^Q$, $q_0' = Q_0$ (initial states of $\Aa$), $F' = \{S\mid S\cap F \neq \emptyset\}$ and
+	\[
+	\rho: Q'\times \Sigma \to Q' \qquad \rho(S, \sigma) =\delta^*(S,\sigma) = \bigcup_{t\in S}\delta(t,\sigma)
+	\]
+	We prove $\Ll(\Aa) = \Ll(\Aa')$ by showing for any $w\in \Sigma^*$ we have $\rho^*(q_0, w) = \delta^*(Q_0,w)$, by induction on $|w|$:
+	\begin{mythrm}
+		[Base:] For $w = \varepsilon$, $\rho^*(q'_0,\varepsilon) = q_0' = Q_0 = \delta^*(Q_0,\varepsilon)$
+	\end{mythrm}
+	\begin{mythrm}
+		[Step:] for $w = x\cdot \sigma$ we have:\begin{flalign*}
+			& \rho^*(q'_0,w) = \rho\left(\rho^*(q'_0,x), \sigma\right) = \rho\left(\delta^*(Q_0,x), \sigma\right) = \\& \delta\left(\delta^*(Q_0,x), \sigma\right) =\delta^*(Q_0,x\cdot \sigma) = \delta^*(Q_0,w)
+		\end{flalign*}
+	\end{mythrm}
+	
+	The claim follows by $F'$'s definition:
+	\[
+	w\in \Ll(A') \iff \rho^*(q_0,w) \cap F \neq \emptyset \iff \delta^*(Q_0,w) \cap F \neq \emptyset \iff w\in \Ll(\Aa)
+	\]
+\end{proof}
+\begin{remark}
+	This is called the detrminization of $\Aa$, and it involves exponential extention: $\Aa$ with $n$ states then $\Aa'$ with $2^n$ states.
+\end{remark}
+\begin{blueBox}
+	\begin{cor}
+		$\Reg$ is closed under concatenation.
+	\end{cor}
+\end{blueBox}
+
+\begin{proof}
+	Let $\Ll_1, \Ll_2\in \Reg$ and $\Aa_1, \Aa_2$ fitting DFAs. Let $\Aa$ be the following automaton: For any $q\in F_1$ define an $\varepsilon$ transition to $q_0^2$ (initial state in $\Aa_2$), $F = F_2$, $Q_0 = \{q_0^1\}$. That is, assume $Q_1\cap Q_2 = \emptyset$, and define:
+	\begin{flalign*}
+		\delta'(q,\sigma) = \begin{cases}
+			\delta(q,\sigma)& q\in Q\\
+			\{S_0\} & \sigma = \varepsilon\\
+			\rho(q,\sigma ) & q\in S\\
+			\emptyset & \text{otherwise}
+		\end{cases}
+	\end{flalign*} Note that:
+	\begin{flalign*}
+		w\in \LL_1\cdot \Ll_2 \iff w = w_1\cdot w_2 \iff \exists \text{two runs $r_1, r_2$ s.t $r_1^n\in F_1, r_2^k \in F_2$} \iff w\in \Ll(\Aa)
+	\end{flalign*}
+	Since $\Aa$ is an NFA with $\Ll(A) = \Ll_1\cdot \Ll_2$, and the previous theorem - we have $\Ll_1\cdot \Ll_2\in \Reg$
+\end{proof}
+\begin{blueBox}
+	\begin{thm}
+		[Closure under star operation]$\Reg$ is closed under star operation.
+	\end{thm}
+\end{blueBox}
+\begin{proof}
+	Let $\Ll\in\Reg$, and note that $\Ll^* = \bigcup_{k\in \NN_{0}}\Ll^k$. Let $\Aa$ such that $\Ll(\Aa) = \Ll$. Define NFA $\Aa'$ for $\Ll^*$ the following way:
+	\begin{itemize}
+		\item $Q' = Q\cup \{q_{start}\}$
+		\item $F  = Q'_0 = \{q_{start}\}$
+	\end{itemize}
+	and:
+	\begin{flalign*}
+		\delta(q,\sigma) = \begin{cases}
+			\{\delta(q,\sigma)\} & q\in Q, \sigma\in \Sigma\\
+			\emptyset & q = q_{start}\\
+			\emptyset & q\in Q\setminus F, \sigma = \varepsilon\\
+			\{q_{start}\} & q\in F, \sigma = \varepsilon\\
+			\{q_0\} & q = q_{start}, \sigma = \varepsilon
+		\end{cases}
+	\end{flalign*}
+	(The intuition here is that $\emptyset$ is a rejecting sink, and that any run that ends in $F$ might "jump" to $q_{start}$).
+\end{proof}
+\subsubsection*{Exponential extention is best case}
+\begin{blueBox}
+	\begin{thm}
+		[Lower bound for space complexity of determinization] Let $\Phi: NFA \to DFA$ a determinzation. Then there exists a family of regular languages $\Ll_k = \Ll(\Aa_k)$ such that: $$|\{\text{states of }\Phi(\Aa_k)\}| = \Omega\left(2^{|\{\text{states of }\Aa_k\}|}\right)$$
+	\end{thm}
+\end{blueBox}
+\begin{proof}
+	Construct a family of languages $\Ll_n$ for $n\in \NN$ such that:
+	\begin{itemize}
+		\item $\Ll_n$ has NFA with $O(n)$ states.
+		\item The smallest DFA for $\Ll_n$ needs at least $2^n$ states.
+	\end{itemize}
+	Over $\Sigma = \{0,1\}$, define $\Ll_n = \{w\in \Sigma^* \mid w_{|w| - (n)} = 1\}$ That is - all words with $1$ in the $n$'th place from the end. An NFA for this is:
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q0)   {$q_0$};
+			\node[state] (q1) at (2,0) {$q_1$};
+			\node[state] (q2) at (4,0) {$q_2$};
+			\node (dot) at (6,0) {$\ldots$};
+			\node[state, accepting] (qacc) at (8,0) {$q_n$};
+			
+			\path[-stealth, thick]
+			(q0) edge [loop above] node{1,0} (q0)
+			edge [bend left] node{1} (q1)
+			(q1) edge [bend left] node{1,0} (q2)
+			(q2) edge[bend left] node{1,0} (dot)
+			(dot) edge node{0,1} (qacc);
+		\end{tikzpicture}
+		\caption{Automaton for $\Ll_n$} \label{fig:M1}
+	\end{figure}
+	Asuume for sake of contradiction there exists a DFA $\Aa_n$ for $\Ll_n$ with less than $2^n$ states. There has to be two words $w_0, w_1$ such that $\Aa_n$ reaches the same state after reading both words (by pigeonhole principle over $(0 + 1)^n$), that is $\delta^*(q_0, w_0) = \delta^*(q_0, w_1)$. Let $i$ be such that $w_0[i] \neq w_1[i]$ and assome WLOG $w_0[i] = 0$. Consider that word $ w' = w_0 \cdot 1^{i-1}$ (we want $w_0[i]$ to be in the $n$'th place from the end)\footnote{Since $w_0 = (0+1)^{i-1}0(0+1)^{n-i}$, concatenating with a word of length $i-1$ puts $w_0[i]$ in the $n$'th place from the end.}. Does $\Aa_n$ accepts $w'$? If yes - it's a contradiction for $\Aa_n$ as an automaton for $\Ll_n$. If not - then $$\delta^*(\delta^*(q_0,w_1), 1^{i-1}) \nim{\text{by choice of $w_1,w_2$}}= \delta^*(\delta^*(q_0,w_0), 1^{i-1})\notin F$$ Once again - a contradiction (since $w_1 1^{i-1} \in \Ll_n$).
+\end{proof}
+\begin{remark}
+	This is not the complete argument. One has to formalize this a little further (will leave empty to force myself to practice)
+\end{remark}
+
+\newpage
+\section{Regular Expressions}
+\subsection{Formal Definition of Regular Expressions}
+We would like to have a compact way of describing words and (regular) languages. That is - DFAs and NFAs are "checking devices", and not ways to \textit{generate} languages.  The generative model we use would be \textbf{Regular Expressions}.
+\begin{yellowBox}
+	\begin{defn}
+		[Regular Expressions] We define a \textbf{Regular Expression over $\Sigma$} inductively:
+		\begin{mythrm}
+			[Base:] $\varepsilon, \emptyset, \sigma$ are regular expressions.
+		\end{mythrm}
+		\begin{mythrm}
+			[Step:] if $r_1, r_2$ are regexes, then:\begin{itemize}
+				\item $r_1 + r_2 = r_1\cup r_2 $ ("Or")
+				\item $r_1\cdot r_2$ ("Concatenation", will usually omit this dot)
+				\item$r_1^*$ ("Star")
+			\end{itemize}
+			Are regexes.
+		\end{mythrm}
+	\end{defn}
+	\begin{defn}
+		[Language of Regex] Let $r$ be a regex. Then $\Ll(r)$ is defined by induction:
+		\begin{mythrm}
+			[Base:] $\Ll(\varepsilon)=\{\varepsilon\}, \Ll(\emptyset) = \emptyset,\Ll(\sigma)= \{\sigma\}$
+		\end{mythrm}
+		\begin{mythrm}
+			[Step:] if $r_1, r_2$ are regexes, then:\begin{itemize}
+				\item $\Ll(r_1 + r_2) = \Ll(r_1) \cup\Ll(r_2)$
+				\item $\Ll(r_1\cdot r_2) = \Ll(r_1 ) \cdot \Ll(r_2)$
+				\item$\Ll(r_1^*) = \Ll(r_1)^*$
+				
+			\end{itemize}
+		\end{mythrm}
+	\end{defn}
+	\begin{remark}
+		We denote $r^+ = r\cdot r^*$ (a non-empty concatenation)
+	\end{remark}
+\end{yellowBox}
+\begin{example}
+	Assume we want words over $\Sigma$ of even length. A regex would be $(\Sigma \cdot \Sigma)^* = ((0+1)\cdot(0+1))^*$
+\end{example}
+\begin{example}
+	Consider the condition "every words that has $0$ in one of the last $3$ characters". Then a fitting regex would be:
+	\[
+	\big((0+1)^*0(0+1)(0+1)\big) + \big((0+1)^*0(0+1)\big) + \big((0+1)^*0\big)
+	\]
+	Alternatively:
+	\[
+	(0+1)^* 0 \big((0+1)+(0+1) + (0+1) + \varepsilon \big)
+	\]
+	Alternatively:
+	\[
+	(0+1)^* 0 (0+1+\varepsilon)(0+1+\varepsilon)
+	\]
+\end{example}
+\begin{example}
+	Consider the complement of the previous regex, that is - words that don't have $0$ in the last $3$ places, a fitting regex would be\begin{flalign*}
+		\varepsilon + 1 + 11 + (0+1)^*111
+	\end{flalign*}
+	(which is simply considering private cases)
+\end{example}
+\subsection{Equivalence with Finite Automata }It should come with no surprise that \textit{regular} expressions have a deep connection to \textit{regular}  languages. What we wish to prove is that any regex in face describes a regular language (thus a finite automata), and vice versa.
+\begin{yellowBox}
+	\begin{defn}
+		[Generalized NFA] A \textbf{Generalized NFA (GNFA)} is an NFA with regexes on the edges, instead of letters (that is, $\delta$ is a function $Q\times \textrm{REGEX} \to 2^Q$).
+	\end{defn}
+	\begin{remark}
+		We assume that:
+		\begin{itemize}
+			\item Unique initial state that is a source.
+			\item Unique accepting state that is a sink.
+			\item $q_{start} \neq q_{end}$
+		\end{itemize}
+	\end{remark}
+\end{yellowBox}
+\begin{claim}
+	Generalized NFAs describe precisely the regular languages.
+\end{claim}
+\begin{proof}
+	No.
+\end{proof}
+\begin{blueBox}
+	\begin{thm}
+		[Characterization of Regular Lnaguages]
+		\[
+		\Ll\in \Reg \iff \Ll = \Ll(r) \text{ for some regex }r
+		\]
+	\end{thm}
+\end{blueBox}
+\begin{proof}
+	\begin{mythrm}
+		[Easy side:] if $\Ll = \Ll(r)$ for some $r$ regex - $\Ll$ is trivially regular (by induction on the regex's structure).
+	\end{mythrm}
+	\begin{mythrm}
+		[Hard side:] Let $\Ll\in \Reg$, we construct a regex $r$ for $\Ll$. We would like to construct an algorithm that gets a DFA and outputs a regex. We will construct a GNFA equivalent to the DFA (Take a look at the example in the Recitation Notes):
+		\begin{enumerate}
+			\item Add $s,t$ states (initial and accepting) with $\varepsilon$ transitions from $s$ to $q_0$ and from $F$ to $t$.
+			\item Start removing states one by one, and "fixing" transitions by defining edges with appropriate regexes.
+			\item We finish with only two states - $s,t$ with a single edge between them. The regex on that edge $r$ satisfies $\Ll(r) = \Ll(\Aa) = \Ll$.
+		\end{enumerate} 
+	\end{mythrm}
+\end{proof}
+
+\section{Nonregular Languages}
+We claimed in the past that $\Ll = \{0^n1^n\mid n\in \Nn_{0} \}$ is not regular. Now we will see how to formally prove this. 
+\begin{claim}
+	\Ll$\notin$\Reg
+\end{claim}
+\begin{proof}
+	By contradiction. Assume $\Aa$ with $p$ states is a DFA for $\Ll$. Consider the word $w = 0^p \cdot 1^p$. Since $w\in \Ll(\Aa)$ there is an accepting run $(q_i)_{i\in [2p]}$. By pigeonhole principle, there are $0 \leq l < j \leq p$ s.t $q_j = q_l$ (since we read $p+1$ states until $q_p$). This means that $\Aa$ accepts the word $0^{p\pm(j-l)}q^p$ (draw this for intuition), contradicting the assumption.
+\end{proof}
+\subsection{Pumping Lemma for regular languages}
+\begin{blueBox}
+	\begin{thm}
+		[Pumping Lemma]
+		Let $\Ll \in \Reg$, then there exists $p\geq 1$ (called the \textbf{pumping constant}) such that for $w\in \Ll$, if $|w| \geq p$, then there exists a partition of $w$ to $w=x\cdot y \cdot z$ such that:
+		\begin{enumerate}
+			\item $|y| >0$ (but we allow $x,z = \varepsilon$)
+			\item $|x\cdot y| \leq p$ 
+			\item For all $i\geq 0$ the word $x\cdot y^i z\in \Ll$
+		\end{enumerate}
+	\end{thm}
+	\begin{remark}
+		This is equivalent to the following statement: \\
+		If for any $p\geq 1$ there exists a word $w\in \Ll$ with $|w|\geq p$ and for any partition of $w$ to $xyz$, if $|y| > 0$ and  $|x\cdot y| \geq p$ then there exists $i\geq 0$ such that $xy^iz\notin \Ll$ then $\Ll$ is not regular. This is simply the counter-positive of the Pumping Lemma.
+	\end{remark}
+\end{blueBox}
+\begin{remark}
+	We will use this mainly to show that a language is not regular - that is, no pumping constant exists.
+\end{remark}
+\begin{proof}
+	Take $p$ to be the number of stats of $\Aa$ an automaton of $\Ll$, consider $w\in \Ll$ with $|w| >p$, then in a run $\Aa(w) = (q_i)_{i\in [n]}$ by pigeonhole principle, there exists\footnote{Can choose $j\leq p$ by taking the $p+1$ prefix of $w$} $0\leq l<j \leq p$ with $q_l = q_j =:s$. Define 
+	\[x = (w_i)_{0 < i \leq l}, y = (w_i)_{l < i \leq j}, z = (w_i)_{q < i \leq n}
+	\] The conditions hold: $|y| > 0$ by choice of $l<j$. $|xy|\leq p$ by choice of $j$, and $xy^iz\in \Ll$  by the run $$
+	\Aa(xy^iz) = (q_k)_{k\in [l]}\left[(q_k)_{l+1\leq k \leq j}\right]^i (q_k)_{k\geq j+1}
+	$$ 
+	As required.
+\end{proof}
+\begin{example}
+	Consider $\Ll = (0+1)^*0(0+1)$, we show that $p=e=\pi=3$ is a pumping constant for $\Ll$. For any $w\in \Ll$ with $|w|\geq 3$, we choose $x = \varepsilon, y = w[1]$ and $z$ be the suffix $(w_i)_{i\geq 2}$. One can verify that the conditions hold.
+\end{example}
+\begin{example}
+	[Applying the Pumping Lemma]  Let $\Ll = \{0^n1^n\mid n\in \NN\}$, we show $\Ll$ is not regular by the previous remark. For any $p\geq 1$ we show that the word $w = 0^p1^p$ is "bad" for any partition. Consider $w = x\cdot y\cdot z$, and show that $x\cdot y^2 \cdot z\notin\Ll$:\\
+	Since $|xy|\leq p$, we must have $xy\in 0^+$, so $y\in 0^+$, that is $y = 0^k$ for some $k\geq 1$, so $xy^2z = 0^{0+|y|}1^p$ contains more $0$s than $1$s, so $xy^2z\notin \Ll$.
+\end{example}
+\begin{example}
+	Consider that language  $\Ll = \{ww\mid w\in \Sigma^*\}$ over the binary alphabet. Let $p\in \NN$, Consider $w = 0^p10^p1$, of course $w\in \Ll$ and $|w| \geq p$ and any partition $xyz$ with $|xy|\leq p$ and $|y| > 0$ satisfies $wy^iz = 0^{p+(i-1)|y|}10^p\notin \Ll$ (for $i=2$ this is $0^{p+|y|}10^p1$).
+\end{example}
+\subsection{Charectarizing Regular Languages}
+\begin{yellowBox}
+	\begin{defn}
+		[Indistinguishable by \Ll]Given a language $\Ll\subset \Sigma^*$ define $R_{\Ll}\subset \Sigma^*\times \Sigma^*$, and for $x,y\in \Sigma^*$ we say $x\sim_{\Ll} y$ (that is, $(x,y)\in R_{\Ll})$) if for any $z\in \Sigma^*$ it holds that $x\cdot z \in \Ll \iff y\cdot z\in \Ll$. We say that $x,y$ are \textbf{indistinguishable} by $\Ll$.
+	\end{defn}
+\end{yellowBox}
+\begin{example}
+	Consider $\Ll = (0+1)^*0(0+1)$, and $11,111\in \Ll$, then $11\sim 111$ since\[
+	11z\in \Ll \iff z\in \Ll \iff 111z\in \Ll
+	\]
+	On the contrary, $10\not\sim_{\Ll} 11$ since the word $z = 1$ is a distinguishing suffix
+\end{example}
+\begin{claim}
+	$R_{\Ll}$ is an equivalence relation.
+\end{claim}
+\begin{proof} By definition:
+	\begin{itemize}
+		\item Symmetric: Yes.
+		\item Reflexive: Yes.
+		\item Transitive: Let $x\sim y \sim w$. Assume $x\not\sim w$, so there exists $z\in \Sigma^*$ (WLOG) with $xz\in \Ll$ but $wz\notin \Ll$. Consider $yz$: if $yz\in \Ll$ this contradicts $y\sim w$. Otherwise - contradicts $x\sim y$.
+	\end{itemize}
+\end{proof}
+\begin{blueBox}
+	\begin{thm}
+		[Myhill Nerode] For $\Ll$ the following are equivalent:
+		\begin{enumerate}
+			\item $\Ll\in \Reg$
+			\item $\left|\faktor{\Sigma^*}{\sim_{\Ll}}\right| < \infty$
+		\end{enumerate}
+	\end{thm}
+\end{blueBox}
+\begin{proof}
+		$(1\Rightarrow 2)$ Let $\Aa$ be an automaton for $\Ll$, and define $\sim_\Aa\in \Sigma^*\times \Sigma^*$ as $x\sim_\Aa y$ if $\delta^*(q_0,x) = \delta^*(q_0,y)$ (that is - the run ends on the same state). Note that $\sim_\Aa$ is an equivalence relation \footnote{Left as an exercise to the avid reader}.
+		\begin{mythrm}[Claim.]
+			$x\sim_{\Aa} y \Rightarrow x\sim_{\Ll} y$
+		\end{mythrm}
+		\begin{proof}
+			[Proof (of the claim).] If $\delta^*(q_0,x) = \delta^*(q_0,y)$ then for $z\in \Sigma^*$ we must have $$\delta^*(q_0,xz) = \delta^*(\delta^*(q_0,x),z) = \delta^*(\delta^*(q_0,y),z) = \delta^*(q_0,yz)$$
+		\end{proof}
+		By the claim - $\sim_{\Aa}$ refines\footnote{That is - $\left|\faktor{\Sigma^*}{\sim_\Aa}\right| \geq \left|\faktor{\Sigma^*}{\sim_{\Ll}}\right|$} $\sim_\Ll$, and of course $\left|\faktor{\Sigma^*}{\sim_\Aa}\right| \leq |Q| < \infty$, thus so is $\left|\faktor{\Sigma^*}{\sim_\Ll}\right|$.
+
+
+		$(2\Rightarrow 1)$ Assume $\left|\faktor{\Sigma^*}{\sim_\Ll}\right| < \infty$ and construct a DFA for $\Ll$. Denote an equivalence class by $[w]$. Then define:
+		\begin{flalign*}
+			Q = \faktor{\Sigma^*}{\sim_\Ll}, \quad q_0 = [\varepsilon],\quad \delta([w],\sigma) = [w\cdot\sigma], \quad F = \{[w]\mid w\in \Ll\}
+		\end{flalign*}
+		Note that $\delta$ is well defined, since for $w,w'\in [w]$ we must have $ w\sigma \sim_{\Ll} w'\sigma$, since if $z$ distinguishes $w\sigma, w'\sigma$ then $\sigma z$ distinguishes $w,w'$. A similar proof shows that $F$ is well defined ("if not, then $\varepsilon$ distinguishes").\\
+		Correctness of $\Aa$: for any word $w\in \Sigma^*$ we must have $\delta^*(q_0, w) = [w]$ (by induction on $|w|$). Thus, $w\in \Ll(\Aa) \iff w\in \Ll$, as required.
+
+\end{proof}
+\begin{example}
+	[Of constructing such DFA] Consider once again $\Ll = (0+1)^*0(0+1)$. The equivalence classes are:
+	\begin{flalign*}
+		&[\varepsilon] = \varepsilon + 1 + (0+1)^*11\\
+		& [0] = 0+(0+1)^*10\\
+		&[00] = (0+1)^*00\\
+		&[01] = (0+1)^*01
+	\end{flalign*}
+	And the automaton is:
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial] (q0)   {$[\varepsilon]$};
+			\node[state] (q1) at (2,0) {$[0]$};
+			\node[state, accepting] (q2) at (4,0) {$[00]$};
+			\node[state, accepting] (q3) at (2,-2) {$[01]$};
+			
+			\path[-stealth, thick]
+			(q0) edge [bend left] node{0} (q1)
+			edge [loop above] node{1} (q0)
+			(q1) edge [bend left] node{0} (q2)
+			edge [bend left]node{1} (q3)
+			(q2) edge [loop right] node{0} (q2)
+			edge [bend left] node{1} (q3)
+			(q3) edge [bend left] node{0}(q1)
+			edge [bend left] node {1}(q0)
+			
+			;
+		\end{tikzpicture}
+		\caption{Automaton with equivalence classes as states} \label{fig:M1}
+	\end{figure}
+\end{example}
+\begin{example}
+	Consider the following example (by Myhill Nerode) for language: $$\Ll = \{0^i 1^j\mid i,j\text{ are relative primes}\footnote{That is, $gcd(i,j) = 1$}\}$$
+	We show that this language is not regular:
+	\begin{mythrm}
+		[Claim.] For any $p_1,p_2$ prime numbers, $0^{p_1}\not\sim 0^{p_2}$.
+	\end{mythrm}
+	\begin{proof}
+		Since $1^{p_1}$ dinsinguishes them: $0^{p_1}1^{p_1}\notin \Ll$ but $0^{p_2}1^{p_1}\in \Ll$.
+	\end{proof}
+\end{example}
+\subsection{Reduction of DFA to minimal DFA}
+\begin{blueBox}
+	\begin{thm}
+		[Algorithm for reducing DFA to minimal DFA]
+		Let $\Aa$ be a DFA for $\Ll$. Define a sequence of equivalence relations\footnote{Proof omitted} $(\equiv_i)_{i=0} \subset Q\times Q$ such that:
+		\[
+		\forall i\quad q\equiv_i q' \iff \forall w\in \Sigma^{\leq i} \qquad \delta^*(q,w)\in F \iff \delta^*(q',w) \in F
+		\]
+		Denote $\Aa^q$ to be $\Aa$ but with initial state $q$. The equivalence relation means that $\Ll(\Aa^q) = \Ll(\Aa^{q'}) \iff q\equiv_i q'$ for all $i$.\\
+		
+		\underline{\textit{Computing $\equiv_i$:}}\\
+		$q\equiv_0 q' \iff (q\in F \iff q'\in F)$. Note that there are only $2$ equivalence classes for $\equiv_0$.\\
+		Assume we computed $\equiv_i$, and compute:\\
+		$q\equiv_{i+1} q'$ iff $q\equiv_i q'$ and for all $\sigma\in \Sigma$, $\delta(q,\sigma)\equiv_i \delta(q',\sigma)$. That is - given the relation table of $\equiv_i$, we can compute efficiently $\equiv_{i+1}$:
+		\begin{itemize}
+			\item Computing $\equiv_0$ takes $O(n^2)$ with $|Q| = n$.
+			\item Given $\equiv_{i}$, computing $\equiv_{i+1}$ takes $|\Sigma|\cdot O(n^2)$
+		\end{itemize}
+		The process stops when $\equiv_{i} = \equiv_{i+1}$ (fixed point), we will show that there has to be a state like that: With every iteration - at least one equivalence class of $\equiv_{i}$ that partitioned into more than on class in $\equiv_{i+1}$. Hence - the process converges with $O(n)$ iterations.\\
+		
+		Putting it all together - the algorithm takes $O(|\Sigma|n^3)$.
+	\end{thm}
+\end{blueBox}
+\subsubsection*{Proof of correctness}
+\begin{prop}
+	If $\equiv_{i} = \equiv_{i+1}$ then $\equiv_j = \equiv_{i}$ for $j>i$.
+\end{prop}
+\begin{proof}
+	Inductively, consider $\equiv_{i+2}$:\begin{flalign*}
+		q\equiv_{i+2} q' \iff q\equiv_{i+1} q' \quad\wedge \quad \forall\sigma \quad \delta(q,\sigma)\equiv_{i+1} \delta(q',\sigma) \iff q\equiv_{i} q'
+	\end{flalign*}
+\end{proof}
+\begin{prop}
+	Let $\Ss = \{S_1\ldots S_k\}$ the equivalence classes of $\equiv_*$ (the first fixed point). Consider $\Aa = \left(\Ss, \Sigma, [q_0], \delta',\Ss_F = \{S_i\mid S_i\subset F\} \right)$, with $\delta'([q],\sigma) =\left[\delta(q,\sigma)\right]$. Everything is well defined. Then:
+	\[
+	q\equiv_{i}q' \iff \left(\Ll(\Aa^q) \cap \Sigma^{\leq i}\right) = \left(\Ll(\Aa^{q'}) \cap \Sigma^{\leq i}\right)
+	\]
+\end{prop}
+\begin{proof}
+	By induction over $i$:\begin{mythrm}
+		[Base:] $q\equiv_0 q'$ iff $\varepsilon\in \Ll(\Aa^{q}) \iff \varepsilon \in \Ll(\Aa^{q'})$.
+	\end{mythrm}
+	\begin{mythrm}
+		[Step:]$(\Rightarrow)$ By contradiction, assume $\exists w\in \Ll(\Aa^q)$ but $w\notin \Ll(\Aa^{q'})$ with $|w|\leq i+1$. Consider two cases:
+		\begin{enumerate}
+			\item If $|w|\leq i$ - contradiction to induction assumption.
+			\item If $|w| = i+1$, then $w = \sigma w'$. We know $w\in \Ll(\Aa^q)$, then:
+			\[F\ni \delta^*(q,\sigma w') = \delta^*(\delta(q,\sigma),w)\]
+			Contradicting $\delta(q,\sigma) \equiv_{i} \delta(q',\sigma)$ since $w'$ distinguishes them.
+		\end{enumerate}
+		$(\Leftarrow)$ By definition.
+	\end{mythrm}
+\end{proof}
+\begin{example}
+	Consider the following automaton:
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial, accepting] (q0)   {$q_0$};
+			\node[state, accepting] (q1) at (2,0) {$q_1$};
+			\node[state] (q2) at (0,-2) {$q_2$};
+			
+			\path[-stealth, thick]
+			(q0) edge [bend left] node{0} (q1)
+			edge [bend left] node{1} (q2)
+			(q1) edge [loop right] node{0} (q1)
+			edge [bend left] node{1} (q2)
+			(q2) edge [bend left] node{0} (q0)
+			edge [loop left] node{1} (q2)
+			;
+		\end{tikzpicture}
+		\caption{Automaton for $\varepsilon + (0+1)^*\cdot 0$}
+	\end{figure}
+	Then:
+	\[
+	\equiv_0 =\left\{\{q_0,q_1\}, \{q_2\}\right\}
+	\]
+	Now, check for $\equiv_1$: since $\delta(q_0,0) = \delta(q_2,0)$ and $\delta(q_0,1) = \delta(q_2,1)$,
+	\[
+	\equiv_1 =\left\{\{q_0,q_1\}, \{q_2\}\right\}
+	\]
+	Hence $\equiv_* = \equiv_0$, thus the minimal automaton:
+	
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+			\node[state,initial, accepting] (q0)   {$\{q_0,q_1\}$};
+			\node[state] (q1) at (0,-2) {$\{q_2\}$};
+			
+			\path[-stealth, thick]
+			(q0) edge [loop right] node{0} (q1)
+			edge [bend left] node{1} (q1)
+			(q1) edge [loop right] node{1} (q1)
+			edge [bend left] node{0} (q0)
+			
+			;
+		\end{tikzpicture}
+		\caption{Minimal Automaton for $\varepsilon + (0+1)^*\cdot 0$}
+	\end{figure}
+\end{example}
+\begin{defn}
+	[Test this]
+	This is a definition
+\end{defn}
