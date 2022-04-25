@@ -777,12 +777,12 @@ Up to this point we used probability to find an object of interest with high pro
 	\begin{enumerate}
   \item  $A_i$ is independent in all $A_j$, except for at most $d$ of them\footnote{Not in pairs! $A_i$ is dependent on the event $\cup_{j\in K} A_j$ for some $K\in {[n]\setminus i\choose d}$}
 	\item $\prob{A_i} \le p$
-	\item $ep(d+1)\le 1$
+	\item $e\cdot p\cdot (d+1)\le 1$
 \end{enumerate}
 Then $\prob{\cap_{i\in [n]}\overline{A_i}} > 0$
 \end{lemma}	
 \end{yellowBox}
-\subsection{Results from the lemma}
+\section{Results from the lemma}
 \begin{thm}
 	[Improvement on \autoref{thm:Ramsey}] If $e\cdot 2^{1-{k\choose 2}}\rbk{{k\choose 2}{n\choose k-2} + 1}<1$, then $R(k,k) > n$
 \end{thm}
@@ -792,5 +792,43 @@ Then $\prob{\cap_{i\in [n]}\overline{A_i}} > 0$
 \begin{exercise}
 Consider a $k$-SAT in which any variable appears in at most $r$ clauses ($k>3r$). Show a polynomial algorithm to decide satisfyability.
 \end{exercise}
-
+\begin{thm}
+	Any $k$-graph (a $k$-uniform hypergraph) in which any edge intersects at most $\frac{2^{k-1}}{e} - 1$ other edges is $2$-colorable.
+\end{thm}
+\begin{proof}
+	Consider a random $2$ coloring $c: X\to \cbk{0,1}$. Assume $A_i$ is the event "the $i$'th edge is monochromatic", then $\prob{A_i} = 2^{1-k}$, and $d = \frac{2^{k-1}}{e}-1$, and the result follows from LLL\footnote{Lov\'az's Local Lemma}.
+\end{proof}
+\subsection{Colorings of $\RR$}
+Consider a coloring $c:\RR\to [k]$. We say $T$ is \emph{Colorful} if $c[T] = [k]$. The question Lov\'{a}s and ??? asked is given a finite $S$, can we color $\RR$ such that $S$ \emph{and all of its translations} are colorful.
+\begin{thm}
+	For any $k$ and for any $S$ of cardinality $m$ such that $$e\cdot k\rbk{1-\frac{1}{k}}^m(m(m-1)+1)\le 1$$  there exists a coloring $c:\RR\to [k]$ such that all of $S$'s translations are colorful.\footnote{Doing the calculations, we get $m \approx(3+o(1))k\log k$}
+\end{thm}
+\begin{proof}
+	Denote $c_x = \cbk{c\mid x + S \text{ is colorful}}$. We want to show that $\bigcap_{x\in \RR} c_x \neq \emptyset$. By compactness arguments, it is sufficient to show that for any finite $X$, $\bigcap_{x\in X}c_x \neq \emptyset$. Consider a random coloring $c:\RR\to [k]$. For any $x\in X$, the event $A_x = $ "$x+S$ is not colorful", hence 
+	\[
+	\prob{A_x}\le k\rbk{1-\frac{1}{k}}^m
+	\]
+	And we note that $A_x,A_y$ are independent unless $(x+S)\cap (y+S) \neq \emptyset$, hence there are at most $m(m-1)$ such $y$'s for which it happens. From LLL we are done.
+\end{proof}
+\subsection{Coverings of $\RR^3$}
+\begin{yellowBox}
+	\begin{defn}
+		[$k$-covering] A $k$ covering of a metric space $X$ is a covering in which any element is in at least $k$ covering sets.
+	\end{defn}
+	\begin{defn}
+		[Reducible] We say a covering $\Uu$ is \emph{reducible} if it can be partitioned into two coverings $\Uu_1,\Uu_2$ that are disjoint in their open sets.
+	\end{defn}
+\end{yellowBox}
+\begin{question}
+	Is there a $k$-covering in which any point is covered exactly $k$ times? $O(k$ times?
+\end{question}
+\begin{thm}
+	[Nani-Levicko, Pach. No Proof] For any $k$ there exists an irreducible $k$-covering of $\RR^3$ by unit balls.
+\end{thm}
+\begin{thm}
+	Any $k$ covering in which any point is covered at most $t:= c\cdot 2^{\frac{k}{3}}$ times is reducible.
+\end{thm}
+\begin{proof}
+	Given a covering $\Uu = \cbk{B_i}_{i\in I}$, define a hypergraph $H$ with vertex set $\Uu$ and edges indexed by $\RR^3$: for any $x\in \RR^3$, $e_x = \cbk{B_i\mid x\in B_i}$ and delete multiple edges. That is, edges correspond to "cells" in $\Uu$. for any $x$, $k\le |e_x|\le t$. We need to show that $H$ is $2$ colorable, which will correspond to two subcoverings. It suffices to show that any finite subgraph of $H$ is $2$-colorable (by compactness). Consider a random $2$-coloring $c$, denote by $A_x$ the event $e_x$ is monochromatic, then $\prob{A_x}\le 2^{1-k}$. If $A_x,A_y$ are dependent, then $d(x,y) \le 4$: If $d(x,y) > 4$, any two balls containing $x,y$ do not intersect.
+\end{proof}
 \end{document}
