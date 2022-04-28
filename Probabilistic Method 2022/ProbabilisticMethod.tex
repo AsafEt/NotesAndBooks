@@ -484,7 +484,7 @@ Var{X} = \sum_{i=1}^m Var{X_i} + \sum_{i=1}^m\sum_{j\sim i}cov{X_i,X_j}
 	\[
 	Var{X}\le \Exp{X} + \sum_i\prob{A_i}\cdot\sum_{i\sim j} \prob{A_j\mid A_i}
 	\] 
-	\item A symmetry assumption is $\sum_{i\sim j} \prob{A_j\mid A_i}$ is independent of $i$. This is usually true in many cases. We denote $\sum_{i\sim j} \prob{A_j\mid A_i} = \Delta^*$\footnote{Usually $ \sum_i\prob{A_i}\cdot\sum_{i\sim j} \prob{A_j\mid A_i} := \Delta$}. With this notation, $Var{X} \le \Exp\cdot(1+\Delta^*)$.
+	\item A symmetry assumption is $\sum_{i\sim j} \prob{A_j\mid A_i}$ is independent of $i$. This is usually true in many cases. We denote $\sum_{i\sim j} \prob{A_j\mid A_i} = \Delta^*$\footnote{Usually $ \sum_i\prob{A_i}\cdot\sum_{i\sim j} \prob{A_j\mid A_i} \defeq \Delta$}. With this notation, $Var{X} \le \Exp\cdot(1+\Delta^*)$.
 	\begin{cor}
 	If $\Exp{X}	\To \infty$, $\Delta^* = o\rbk{\Exp{X}}$, then $\prob{X=0}\To 0$.
 	\end{cor}
@@ -560,7 +560,7 @@ Then $p\ll n^{-5/7}$ implies $\prob{X > 0}\To 0$. Is it true that $p\gg n^{-5/7}
 \begin{defn}
 	[Maximal Subgraph Density] Given $H$, we define its maximal density by
 	\[
-	m(H) := \underset{\emptyset\neq A\subset V(H)}{\max} \frac{e(A)}{|A|}
+	m(H) \defeq \underset{\emptyset\neq A\subset V(H)}{\max} \frac{e(A)}{|A|}
 	\]
 \end{defn}	
 \begin{remark}
@@ -614,7 +614,7 @@ $|S| \le \log(n) + 0.5\log\log(n) + o(1)$
 \begin{proof}
 	Let $S = \{s_1\ldots s_m\}$ and consider a random partial sum $X = \sum_{i=1}^m b_is_i$ with $b_i\sim U(\{0,1\}$.
 	\[
-	\mu :=\Exp{X} =\sum_{i=1}^m\frac{s_i}{2}\quad\text{and}\quad  Var{X}\sum_{i=1}^m\frac{s_i^2}{4}
+	\mu \defeq\Exp{X} =\sum_{i=1}^m\frac{s_i}{2}\quad\text{and}\quad  Var{X}\sum_{i=1}^m\frac{s_i^2}{4}
 	\]
 	Now try to bound the variation:
 	\begin{flalign*}
@@ -772,7 +772,7 @@ The \emph{Erd\H{o}s Hananni conjecture} is that for any $k,r$, when $n\to\infty$
 \chapter{Lov\'asz's Local Lemma}
 Up to this point we used probability to find an object of interest with high probability.  The \emph{Local Lemma} is a tool to prove an object's existence even if the probability of finding them is small - even exponentially. In fact, this is an \emph{algorithmic} approach.
 \begin{yellowBox}
-\begin{lemma}
+\begin{thm}
 	[The local Lemma, Symmetric]\label{Local Lemma} Let $(A_i)_{i\in [n]}$ be events such that:
 	\begin{enumerate}
   \item  $A_i$ is independent in all $A_j$, except for at most $d$ of them\footnote{Not in pairs! $A_i$ is dependent on the event $\cup_{j\in K} A_j$ for some $K\in {[n]\setminus i\choose d}$}
@@ -780,7 +780,7 @@ Up to this point we used probability to find an object of interest with high pro
 	\item $e\cdot p\cdot (d+1)\le 1$
 \end{enumerate}
 Then $\prob{\cap_{i\in [n]}\overline{A_i}} > 0$
-\end{lemma}	
+\end{thm}	
 \end{yellowBox}
 \section{Results from the lemma}
 \begin{thm}
@@ -790,6 +790,7 @@ Then $\prob{\cap_{i\in [n]}\overline{A_i}} > 0$
 	Let $G\sim \Gg(n,1/2)$. For any $S\in {[n]\choose k}$, denote $A_S$ the even that $S$ is a clique or an anti-clique. We know that $\prob{A_S} = 2^{1-{k\choose 2}}$. Note that $A_S$ is independent in all  $A_M$ other than at most $ {k\choose 2}{n\choose k-2}$. Then by the \autoref{Local Lemma} - there exists a graph in which no $A_S$ occures. 
 \end{proof}
 \begin{exercise}
+\label{Ex local lemma}
 Consider a $k$-SAT in which any variable appears in at most $r$ clauses ($k>3r$). Show a polynomial algorithm to decide satisfyability.
 \end{exercise}
 \begin{thm}
@@ -826,9 +827,78 @@ Consider a coloring $c:\RR\to [k]$. We say $T$ is \emph{Colorful} if $c[T] = [k]
 	[Nani-Levicko, Pach. No Proof] For any $k$ there exists an irreducible $k$-covering of $\RR^3$ by unit balls.
 \end{thm}
 \begin{thm}
-	Any $k$ covering in which any point is covered at most $t:= c\cdot 2^{\frac{k}{3}}$ times is reducible.
+	Any $k$ covering in which any point is covered at most $t\defeq c\cdot 2^{\frac{k}{3}}$ times is reducible.
 \end{thm}
 \begin{proof}
-	Given a covering $\Uu = \cbk{B_i}_{i\in I}$, define a hypergraph $H$ with vertex set $\Uu$ and edges indexed by $\RR^3$: for any $x\in \RR^3$, $e_x = \cbk{B_i\mid x\in B_i}$ and delete multiple edges. That is, edges correspond to "cells" in $\Uu$. for any $x$, $k\le |e_x|\le t$. We need to show that $H$ is $2$ colorable, which will correspond to two subcoverings. It suffices to show that any finite subgraph of $H$ is $2$-colorable (by compactness). Consider a random $2$-coloring $c$, denote by $A_x$ the event $e_x$ is monochromatic, then $\prob{A_x}\le 2^{1-k}$. If $A_x,A_y$ are dependent, then $d(x,y) \le 4$: If $d(x,y) > 4$, any two balls containing $x,y$ do not intersect.
+	Given a covering $\Uu = \cbk{B_i}_{i\in I}$, define a hypergraph $H$ with vertex set $\Uu$ and edges indexed by $\RR^3$: for any $x\in \RR^3$, $e_x = \cbk{B_i\mid x\in B_i}$ and delete multiple edges. That is, edges correspond to "cells" in $\Uu$. for any $x$, $k\le |e_x|\le t$. We need to show that $H$ is $2$ colorable, which will correspond to two subcoverings. It suffices to show that any finite subgraph of $H$ is $2$-colorable (by compactness). Consider a random $2$-coloring $c$, denote by $A_x$ the event $e_x$ is monochromatic, then $\prob{A_x}\le 2^{1-k}$. If $A_x,A_y$ are dependent, then $d(x,y) \le 4$: If $d(x,y) > 4$, any two balls containing $x,y$ do not intersect. We now claim that any edge $e_x$ intersects at most $c\cdot t^3$ other edges. By the previous claim - any ball intersecting some ball containing $x$ is contained in $ B_4(x)$, and any point is covered at most $t$ times - thus the sum of volumes of balls intersecting some ball with $x$ is $N \le 4^3\cdot B_1 \approx 4^3$. The number of sells is hence at most $N^3\nim{\text{exercise}}\le 4^9t^3$, thus by LLL $H$ is $2$-colorable if $e\cdot 2^{1-k}(4^9t^3 + 1)\le 1$: choosing $c$ appropriately guarantees this.
 \end{proof}
+\begin{remark}
+	If we start with a $2k$ cover and we want to partition into two $k$-coverings, this happens w.h.p polinomilally. From $3k$ to two $k$-coverings, we need to bound $$\prob{\text{Less than $k$ blue or less than $k$ red}} \ge 2\cdot \lambda^{-k}$$, and we get exponential h.p.
+\end{remark}
+\section{Proof of the Local Lemma}
+\begin{yellowBox}
+\begin{defn}
+	[Dependencies Graph] Let $\Aa = \cbk{A_1\ldots A_n}$ be events in some probability space. The \emph{Dependencies Graph} of $\Aa$ is the DiGraph with $V = \Aa$ and $A_i$ is independent of all $A_j$ such that $A_iA_j\notin E$. We identify $A_i$ with $i$.
+\end{defn}
+\end{yellowBox}
+\begin{thm}
+	[The True Local Lemma]\label{lemma: Local Lemma restate} Let $\Aa$ be some events with dependencies graph $\Dd$. If there exists $0<x_i < 1$ with 
+	\[
+	\prob{A_i}\le x_i\cdot \prob{i\to_{\Dd} j}(1-x_j)
+	\]
+	then
+	\[
+	\prob{\bigcap_{i\in [n]}\overline{A_i}} \ge \prod_{i\in [n]}(1-x_i)
+	\]
+	In particular, if $\Aa$ are pairwise independent, then $\prob{\bigcap_i\overline{A_i}} = \prod_i(1-x_i)$. In the symmetric case, taking $x_i = \frac{1}{d+1}$, by assumption $e\cdot p\cdot(d+1)\le 1$ we have
+	$\prob{A_i}\le p\le \frac{1}{e\cdot(d+1)}\le x_i \rbk{1-\frac{1}{d+1}}^d$.
+\end{thm}	
+\begin{remark}
+	This implies \autoref{Local Lemma}
+\end{remark}
+\begin{proof}
+	For any $i$, for any $i\notin S\subset [n]$, $\prob{A_i\mid \cap_{j\in S}\overline{A_j}}\le x_i$. This implies the lemma, since 
+	\[
+	\prob{\bigcap \overline{A_i}} = \prod_{i=1}^n\prob{\overline{A_i}\mid \bigcap_{j=1}^{i-1}\overline{A_i}}\ge \prod_i(1-x_i)
+	\]
+	So we prove the claim by induction on $|S|$:\\
+	$|S| = 0$ we get from the assumption.\\
+	Define $S_1= \cbk{j\in S \mid (i,j)\in \Dd}$ and $S_2 = S\setminus S_1$, and let $B = \bigcap_{j\in S_1}\overline{A_j}$ and $C = \bigcap_{j\in S_2}\overline{A_j}$. Then:
+	\[
+	\prob{A_i\mid B\cap C} = \frac{\prob{A_i\cap B\mid C}}{\prob{B\mid C}}\le \frac{\prob{A_i \mid C}}{\prob{B\mid C}} = \frac{\prob{A_i}}{\prob{B\mid C}}\le \frac{x_i\prod_{i\to j}(1-x_j)}{\prob{B\mid C}}
+	\]
+	So we need to show $\prob{B\mid C}\ge \prod_{j\in S_1}(1-x_j)$. Denote $S = \cbk{j_k}_{k\in [t]}$, then:
+	\begin{align*}
+		& \prob{B\mid C} = \prod_{k\in [t]}\prob{\overline{A_{j_k}}\mid \prod_{k'=1}^{k-1}\overline {A_{j_{k'}}}\cap C}\nim{\text{induction }}\ge \prod_{k=1}^t(1-x_{j_k}) = \prod_{j\in S_1}(1-x_j)
+	\end{align*}
+	
+	\end{proof}
+	\subsection{The Algorithmic Version of the Lemma}
+	Assume $A_1\ldots A_n$ are events in some product space $\Sigma^N$ That satisfy the conditions of \autoref{lemma: Local Lemma restate}. Is it possible to efficiently find $(\sigma_1,\ldots ,\sigma_N)\in \Sigma^N$ such that no $A_i$ holds? This is a generalization of \autoref{Ex local lemma}.
+	\paragraph{The Moser-Tard\"os Algorithm for $SAT$:} Consider a  random $\sigma$. If some $A_i$ holds - resample all of the $\sigma_i$ on which he is dependent.
+	\begin{claim}
+		The expected number of times $A_i$ is resampled is at most $\frac{x_i}{1-x_i}$ - so the runtime of the algorithm is linear.
+	\end{claim}
+	\begin{proof}
+		No forml Proof. Consider the "log"\footnote{Computer-wise} of the events we've taken care of: $A,B,A,C,B,D,C,A'\dots$, and we ask "why is $A'$ resampled?" - we build a tree rooted at $A'$ - one of its predecessors in the log "broke it", say $C$ (so $C$ is a child of $A'$ in the tree), and maybe $D$ as well. Continue in this manner. We ask the probability for such a tree to occurre - and bound this. In fact, $\sum_{T\text{ Tree}}\prob{T} \le \frac{x_I}{1-x_i}$
+	\end{proof}
+	\chapter{Concentration of Measure}
+\chapter{Extras}
+\section{Crossing number}
+Turan worked on this in WWII.
+
+\begin{defn}
+	[Crossing Number] For a graph $G$, the \emph{Crossing Number} $c(G)$ is the minimal amount of intersections between edges when drawn in $\RR^2$
+\end{defn}
+\begin{claim}
+	For any $G$, $c(G) \ge e-(3v-6) \ge e-3v$
+\end{claim}
+\begin{proof}
+	From Euler's Formula
+\end{proof}
+And now consider taking a random induced subgraph $G'$ we have that $\Exp{c(G')} = p^4c\ge p^2e - 3pv$, thus
+	\[
+	c\ge \frac{e}{p^2}-\frac{3v}{p^3}
+	\]
+optimizing $p$ we get $p = \frac{9v}{2e}$, so when $e > \frac{9v}{2}$, then $c \ge \alpha\cdot \frac{e^3}{v^2}$ Plugging into LHS (when $p<1$). Therefore when taking a dense subgraph $e\sim v^2$, then $c\gtrsim v^4$
 \end{document}
