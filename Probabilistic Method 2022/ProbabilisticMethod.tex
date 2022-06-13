@@ -882,7 +882,781 @@ Consider a coloring $c:\RR\to [k]$. We say $T$ is \emph{Colorful} if $c[T] = [k]
 	\begin{proof}
 		No forml Proof. Consider the "log"\footnote{Computer-wise} of the events we've taken care of: $A,B,A,C,B,D,C,A'\dots$, and we ask "why is $A'$ resampled?" - we build a tree rooted at $A'$ - one of its predecessors in the log "broke it", say $C$ (so $C$ is a child of $A'$ in the tree), and maybe $D$ as well. Continue in this manner. We ask the probability for such a tree to occurre - and bound this. In fact, $\sum_{T\text{ Tree}}\prob{T} \le \frac{x_I}{1-x_i}$
 	\end{proof}
-	\chapter{Concentration of Measure}
+	\chapter{Concentration of Measure and Martingales}
+	\section{Chernoff Bound}
+	\begin{thm}
+		[Chernoff Bound, Hoeffding]\label{thm: Chernoff Bound} Let $X_1\ldots X_n\underset{i.i.d}{\sim}\cbk{\pm1}$, then
+		\[
+		\prob{\sum_{i=1}^n X_i > t}\le e^{-\frac{t^2}{2n}}
+		\]
+		In particular - $t = \alpha\sqrt{n}$ then the bound is $ e^{-\frac{\alpha^2}{2}}$, like the Gaussian Tail. If $t = \alpha\cdot n$ then the bound is $e^{-\frac{\alpha^2n}{2}}\nim{n\to\infty}\To 0$ exponentially.
+	\end{thm}	
+	\begin{remark}
+		This can be generalized: Let $X_1\ldots X_n$ be Bernouli independent RV, with $\mu = \Exp{\sum X_i}$, then
+		\[
+		\prob{\sum X_i > (1+\varepsilon)\mu} \le e^{-C_\varepsilon \mu^2}
+		\]
+	\end{remark}
+	\begin{proof}
+		\begin{flalign*}
+			&\prob{\sum_{i=1}^n X_i > t} \nim{\lambda > 0}= \prob{e^{\lambda\sum_{i=1}^n X_i} > e^{\lambda t}}\nim{\text{Markov}}< \frac{\Exp{e^{\lambda\sum_{i=1}^n X_i}}}{e^{\lambda t}} = \\
+			&\frac{\Exp{\prod_{i=1}^ne^{\lambda X_i}}}{e^{\lambda t}}\nim{\text{i.i.d}}= \frac{\Exp{e^{\lambda X_1}}^n}{e^{\lambda t}}
+		\end{flalign*}
+		Note that $\Exp{e^{\lambda X_1}}^n$ is the \emph{Moment Generating Function}. Since $\Exp{e^{\lambda X_1}} = e^{\frac{\lambda^2}{2}}$, plugging it in results in
+		\[
+		e^{\frac{\lambda^2}{2}n - \lambda t} \nim{\lambda = t/n}=e^{-\frac{t^2}{2n}} 
+		\]
+	\end{proof}
+	
+	\subsection{Discrepancy}
+	\begin{thm}\label{thm: Discrepancy}
+		Let $A_1\ldots A_m\subset [n]$, then there exists $f:[n]\to \cbk{\pm1}$ such that for all $i$,  
+		\[
+		\abs{\sum_{x\in A_i} f(x)}\le \sqrt{3n\log m}
+		\]
+	\end{thm}
+	\begin{remark}
+		[Spencer] When $m=n$,
+		can reduce to $6\sqrt{n}$. \footnote{Six Standard Deviations Suffice}
+ 	\end{remark}
+ 	\begin{proof}
+ 		Let $f$ be chosen randomly. Then:
+ 		\[
+ 		\prob{\abs{\sum_{x\in A_i}f(x)} > \sqrt{3n\log m}} \le 2e^{\frac{3n\log m}{2|A_i|}}\le 2m^{-\frac{3}{2}}
+ 		\]
+ 		So
+ 		\[\prob{\exists i \text{ such that } \abs{\sum_{x\in A_i}f(x)} > \sqrt{3n\log m}} \le m\cdot 2m^{-\frac32}\nim{\text{Large enough } m} < 1
+ 		\]
+ 	\end{proof}
+ 	\begin{thm}\label{them: disc 2}
+ 		Let $G\sim \Gg(n,\frac{1}{2})$. Then with probability $1-o(1)$, for any $U\subset [n]$ of size $u$:
+ 		
+ 		\[
+ 		(\star) \qquad \abs{\abs{E(U)}-\frac{1}{2}{u\choose 2}}\le u^{\frac32}\sqrt{\log\rbk{\frac{en}{u}}}
+ 		\]
+ 	\end{thm}
+ 	\begin{proof}
+ 		\begin{align*}
+ 			&\prob{\text{The theorem Fails}} \le \sum_{u=1}^n{n\choose u}\cdot\prob{\neg (\star)} \le \sum_{u=1}^n\rbk{\frac{en}{u}}^u\cdot e^{-\frac{\rbk{2u^\frac32\sqrt{\log\frac{en}{u}}}^2}{2{u\choose 2}}} \le \\
+ 			&\sum_u
+ 		\end{align*}
+ 		\hl{Complete this}
+ 	\end{proof}
+\subsection{Hidwiger's Conjecture}
+Recall the $4$ color theorem: 
+\begin{thm}[4-color theorem]\label{thm:4color}
+	If $\chi(G)\ge 5$ then $G$ is nonplanar.
+\end{thm}
+\begin{thm}
+	[Wagner]\label{thm: Wagner}
+	$G$ is nonplanar iff $G$ contains $K_5$ or $K_{3,3}$ as a \emph{minor}\footnote{A subgraph obtained by deleting vertices, deleting edges or contracting edges}, and we denote $K_5,K_{3,3}\le G$
+\end{thm}
+Combining these results show that if $\chi(G)\ge 5$ then $G$ contains $K_5$ or $K_{3,3}$ as a minor. In fact - it can be shown that
+\begin{thm}
+	$\chi(G)\ge 5\Rightarrow K_5\le G$
+\end{thm}
+\begin{conjecture}
+	$\chi(G)\ge t\Rightarrow K_t\le G$
+\end{conjecture}
+This is an open problem for $t\ge 7$.
+\begin{conjecture}
+	[Hajos]\label{conj:Hajos} If $\chi(G)\ge t$ then $G$ contains a \emph{partitioning}\footnote{Topological Minor} of $K_t$, and we denote $K_t\hookrightarrow G$.
+\end{conjecture}
+Funny thing - this conjecture is way, way off. The following theorem shows this.
+\begin{thm}
+	There exists a graph $G$ over $n$ vertices such that $\chi(G)\ge \frac{n}{2\log n}$, and $G$ does not contain $K_{10\sqrt{n}}$ as a topological minor.
+\end{thm}
+
+\begin{proof}
+	Let $G\sim \Gg(n,1/2)$ and $K_{10\sqrt{n}}	\hookrightarrow G$. Then there exists $A\subset [n]$ with $|A| = 10\sqrt{n}$ that are the vertices of $K_{10\sqrt{n}}$ in the partitioning of its edges. Note that $|E(K_{10\sqrt{n}})| \approx 50n$. But at most $n$ edges of this embedding use vertices outside of $A$, so we need to show that w.h.p there is no such $A$ that contains $\ge 49n$ edges. This follows from Chernoff\autoref{them: disc 2}
+\end{proof}
+\section{Martingales}
+\begin{yellowBox}
+	\begin{defn}
+		[Martingale] A sequence of random variables $z_0,z_1\ldots$ is called a \emph{Martingale} if $\Exp{\abs{z_i}}<\infty$ and
+		\[
+		\Exp{z_{i+1}\mid z_0\ldots z_i} = z_i
+		\]
+		Equivalently, 
+	\[
+	\Exp{z_{i+1} - z_i\mid z_0\ldots z_i} = 0
+	\]
+	\end{defn}
+	\begin{remark}
+		The second equality is much stronger than saying $\Exp{z_{i+1}-z_i} = 0$, as the equality in the definition is between \emph{Random Variables}.
+	\end{remark}
+\end{yellowBox}
+\begin{example}
+	Let $x_1\ldots x_n \nim{\text{ind.}}\sim \cbk{\pm1}$ and $z_i = \sum_{j=1}^i x_j$. Then:
+	\[
+	\Exp{z_{i+1}\mid z_0\ldots z_i} = \Exp{z_i + x_{i+1}\mid z_0\ldots z_i} = \Exp{z_i\mid z_0\ldots z_i} + \overbrace{\Exp{x_{i+1}\mid z_0\ldots z_i}}^0 = z_i
+	\]
+\end{example}
+\begin{example}
+	For any gambling strategy in a fair Casino, \hl{Complete this}
+\end{example}
+\begin{example}
+	[Doob, exposure martingale] Let $x_1\ldots x_n\To \Omega$ be independent, and $f: \Omega ^n\to \RR$. Define
+	\[
+	z_i(x) \defeq \EE_{x_j\mid j>i}\sbk{f(x_1,\ldots x_i,x_{i+1},\ldots x_n}
+	\]
+	That is, in the $i$'th state we were given the values of $x_1\ldots x_i$, and $z_i$ gives his best guess to the value of $f(x)$ by taking expectation. Note that $z_0 = \Exp{f(x)}$ and $z_n = f(x)$.
+	
+	Consider $x_{i,j}\in \cbk{0,1}$ for any $1\le i < j \le n$ that encode a graph. Assume $f$ is some parameter of graph (say $\chi$). Then the exposure martingale is called the \emph{Edge Exposure Martingale}. 
+	
+	Consider $X_i = \cbk{j<i \mid j\sim_G i}$ for some underlying graph $G$. Then they can define (similarly) a martingale, that's called the \emph{Vertex Exposure Martingale}.
+\end{example}
+
+\begin{thm}
+	[Azuma's inequality]\label{thm:Azuma} Let $z_i$ be a martingale such that $\abs{z_{i+1}-z_i} < c_{i+1}$\footnote{This assumption is called \emph{Bounded differences}}, and that $z_0$ is deterministic (that is - a constant RV). Then
+	\[
+	\prob{z_n-z_0 > t}\le e^{-\frac{t^2}{2\sum c_i^2}}
+	\]
+	That is - the place we "end the process" much further than where we started behaves like centralized RVs.
+\end{thm}
+\begin{remark}
+	In the context of exposure martingales: Let $x_1,\ldots,x_n\in \Omega$ are independent, and $f$ is \emph{$C = (c_1,\ldots c_n)$-Lipschitz} in the sense that if $x,x'$ differ only in $x_i$, then $\abs{f(x)-f(x')}\le c_i$.  Then \[
+	\prob{f(x) - \Exp{f(x)} > t}\le e^{-\frac{t^2}{2\sum c_i^2}}\]
+\end{remark}
+\begin{lemma}
+\label{lemma: inverse Jensen}
+	Assume $Y$ is a random variable with expectation $0$ and $|Y|\le c$. Then \[
+	\Exp{e^Y}\le \frac{e^c + e^{-c}}{2}\le e^{-\frac{c^2}{2}}\] with equality iff $Y \overset{U}{\sim}\cbk{\pm c}$
+\end{lemma}
+\begin{proof}
+	Consider the graph $e^Y$, say that the line connecting $e^c$ with $e^{-c}$ has the equation $a + by$, then by convexity - $e^Y \le a+bY$ so $\Exp{e^Y} \le \Exp{a + bY}\nim{\Exp{Y} = 0}= a$, and $a = \frac{e^c+e^{-c}}{2}$.
+\end{proof}
+\begin{proof}
+	[Proof (Of \autoref{thm:Azuma}).]
+	WLOG $z_0 = 0$. Now:
+	\begin{align}
+	 \Exp{e^{\lambda z_n}} &= \Exp{e^{\lambda(z_n-z_{n-1})}\cdot e^{\lambda z_{n-1}}} = \\
+	& = \underset{z_1\ldots z_{n-1}}{\EE}\sbk{\Exp{e^{\lambda(z_n-z_{n-1})}\cdot e^{\lambda z_{n-1}}\mid z_1\ldots z_{n-1}}} = \\
+	& = \underset{z_1\ldots z_{n-1}}{\EE}\sbk{\Exp{e^{\lambda(z_n-z_{n-1})}\mid z_1\ldots z_{n-1}}\cdot e^{\lambda z_{n-1}}}
+	\end{align}
+	Now, for every sample $z_1,\ldots z_{n-1}$,$\Exp{\lambda(z_n-z_{n-1})\mid z_1\ldots z_{n-1}} = 0$ by definition. Moreover, $\abs{\lambda(z_n-z{n-1})}<\abs{\lambda}c_n$. So by \autoref{lemma: inverse Jensen} taking $Y = \lambda(z_n - z_{n-1})$ \emph{conditioned by $z_1\ldots z_{n-1}$}, we have:
+	\begin{align*}
+		\underset{z_1\ldots z_{n-1}}{\EE}\sbk{\Exp{e^{\lambda(z_n-z_{n-1})}\mid z_1\ldots z_{n-1}}\cdot e^{\lambda z_{n-1}}} \le \underset{z_1\ldots z_{n-1}}{\EE}\sbk{e^{\frac{\lambda^2c_n^2}{2}}\cdot e^{\lambda z_{n-1}}}
+	\end{align*}
+	Continuing inductively, we get 
+	\[
+	\le\ldots \le e^{\lambda^2\rbk{\sum_i c_i^2}/2}
+	\]
+	And now
+	\[
+	\prob{z_n-z_0 > t} = \prob{e^{\lambda (z_n - z_0)} > e^{\lambda t}} \nim{\textrm{Markov}}\le \frac{e^{\lambda^2\rbk{\sum_i c_i^2}/2}}{e^{-\lambda t}}
+	\]
+	Optimizing $\lambda$ we get the desired bound.
+\end{proof}
+\begin{example}
+	We throw $n$ balls into $n$ cells independently. Denote the number of empty cells by $L = \sum L_i$. Then $\Exp{L} = \sum_{i=1}^n \Exp{L_i} = n\cdot\rbk{1-\frac{1}{n}}^n \in \sbk{\frac{n-1}{e},\frac{n}{e}}$.
+	\begin{claim}
+		$\prob{\abs{L - \frac{n}{e}} > 1+t\sqrt{n}}\le e^{-\frac{t^2}{2}}$
+	\end{claim}
+	\begin{proof}
+		Let $X_i\in [n]$ be the cell the $i$th ball went into. Note that $L(X_1,\ldots X_n)$ is $1$-Lispchitz, and the claim follows by Azuma.
+	\end{proof}
+\end{example}
+
+\begin{example}
+	Consider $\chi(G)$ with $G\sim \Gg(n,p)$.
+	\begin{claim}
+		For all $p$, let $X = \chi(G\sim \Gg(n,p))$. Then
+		\[
+		\prob{\abs{X - \Exp{X}} > t\sqrt{n}} < e^{-\frac{t^2}{2}}
+		\]
+	\end{claim}
+	\begin{proof}
+		We use the Vertex Exposure Martingale. $\chi$ is $1$-Lipschitz, and the claim follows by Azuma.
+	\end{proof}
+	In fact, this result can be strengthened. We do not prove this.
+	\begin{claim}
+		If $p = n^{-\alpha}$ with $\alpha > \frac{1}{2}$, then there exists $\mu = \mu(n,p)$ such that
+		\[
+		\prob{\mu \le \chi(\Gg(n,p)) \le \mu + 1}\nim{n\to\infty}\To 1
+		\]
+		This type of claim is called \emph{Two Point Concentration}
+	\end{claim}
+	\begin{claim}
+		[Relaxation]
+		If $p = n^{-\alpha}$ with $\alpha > \frac{5}{6}$, then there exists $\mu = \mu(n,p)$ such that
+		\[
+		\prob{\mu \le \chi\rbk{\Gg(n,p)} \le \mu + 3}\nim{n\to\infty}\To 1
+		\]
+	\end{claim}
+	\begin{proof}
+		Let $G\sim \Gg(n,p)$, and fix $\varepsilon$. Let $\mu$ be the maximal number such that $\prob{\chi(G) < \mu} < \varepsilon$. We show that $\prob{\chi(G) > \mu. +3} < \varepsilon$ and get the result. Let $Y$ be the minimal size of a subset $S\subset V(G)$ such that $G\setminus S$ is $\mu$-colorable. Note that $Y$ is $1$-Lipschitz with respect to vertex-exposure. Moreover
+		\[
+		e^{-\frac{\lambda^2}{2}}\varepsilon \le \prob{\chi(G) \ge \mu} = \prob{Y = 0} \nim{\mathrm{Azuma}}\le e^{-\frac{-\Exp{Y}^2}{2n}}
+		\]
+		and therefore $\Exp{Y} \le \lambda\sqrt{n}$. Now:
+		\[
+		\prob{Y >  2\lambda\sqrt{n}} = \prob{Y > \Exp{Y} + \lambda\sqrt{n}}\le e^{-\frac{\lambda^2}{2}} = \varepsilon
+		\]
+		We not prove this, but under the assumption on $p$ - any set of vertices of size $\le 2\lambda\sqrt{n}$ is $3$-colorable (because it's sparse), and the theorem follows.
+	\end{proof}
+\end{example}
+\begin{example}
+	Consider the Hamming Cube $H^n = \cbk{0,1}^n$ with Hamming distance $d_H(x,y)$.
+	\begin{defn}
+		Let $A\subset H^n$ and $t>0$. Define $A_t \defeq \cbk{x\mid d_H(x,A)\le t}$
+	\end{defn}
+	\begin{question}
+	[Isoperimetric inequality] What is the minimal size of $A_t$ given $|A|$?
+	\end{question}
+	In Euclidian space this is asking the minimal perimeter body for a given volume? The answer is a sphere.
+	\begin{thm}
+		[Harper]\label{thm: Isoperimetric Harper} The optimal $A$ in $H^n$ is a ball.
+	\end{thm}
+	\begin{thm}
+		If $|A| = \varepsilon \cdot 2^n$, then there exists $2\sqrt{2\log \frac{1}{\varepsilon}} = t>0$ such that $|A_{t\sqrt{n}}|>(1-\varepsilon)2^n$.
+	\end{thm}
+	\begin{proof}
+		Let $x\in \cbk{0,1}^n$, and let $f(x) = d_H(x,A)$. Clearly $f$ is $1$-Lipschitz, and $\prob{f(x) =0} = \frac{|A|}{2^n} = \varepsilon$. But also,
+		\begin{align*}
+			\prob{f(x) = 0}\le \prob{f(x) - \Exp{f(x)}\le -\Exp{f(x)}}\nim{\text{Azuma for $-t$}}\le e^{-\frac{\Exp{f(x)}^2}{2n}}
+		\end{align*}
+		So $\Exp{f(x)}\le \sqrt{2\log\frac{1	}{\varepsilon}\cdot n}$, so now:
+		\begin{align*}
+			\frac{|\overline{A_{t\sqrt{n}}}|}{2^n} = \prob{f(x) > t\sqrt{n}} =\prob{f(x) - \Exp{f(x)} > \sqrt{2\log\frac{1	}{\varepsilon}\cdot n}}\nim{\text{Azuma + calculations}}\le \varepsilon
+		\end{align*}
+	\end{proof}
+	\begin{thm}
+		For any $A\subset H^n$, for any $t>0$, $\frac{|A|}{2^n}\cdot\frac{|\overline{A_{t\sqrt{n}}}|}{2^n}\le e^{-\frac{t^2}{4}}$
+	\end{thm}
+\end{example}
+\section{Talagrand's Inequality}
+	\subsection{The LIS problem}
+	Talagrand's motivation was the \emph{Longest Increasing Subsequence} problem: Given $\pi\sim \Uni{S_n}$, what is the longest length of an increasing subsequence in $\pi$? Denote it $L$. It's relatively easy to show that w.h.p $L = \Theta(\sqrt{n})$. For the upper bound:
+	\begin{align*}
+		\Exp{\#\text{increasing subsequences of length }k} = {n\choose k}\cdot\frac{1}{k!}\leq \rbk{\frac{en}{k}}^k\cdot\rbk{\frac{e}{k}}^k = \rbk{\frac{e^2n}{k^2}}^k\nim{k = \Omega(\sqrt{n})}\To 0
+	\end{align*}
+	Now, take $x_i\sim \Uni{[0,1]}$ and order them increasingly. Then $L$ is $1$-Lipschitz, and then the concentration of measure is $\approx \sqrt{n}$. 
+	\begin{yellowBox}
+	\begin{defn}[Talagrand Distance]
+		Let $A\subset \Omega^n$. The \emph{Talagrand Distance} between $A$ and $x\in \Omega^n$ is
+		\[
+		d_T(A,x) = \underset{\alpha\in \RR^n_+, \norm{\alpha}_2 = 1}{\max} \underset{y\in A}{\min} \sum_{i \text{ s.t }x_i\neq y_i}\alpha_i
+		\]
+	\end{defn}	
+	\begin{remark}
+		$d_T(A,x) \ge \frac{1}{\sqrt{n}}d_H(A,x)$ by taking $\alpha_i = 1/\sqrt{n}$
+	\end{remark}
+	\end{yellowBox}
+	Therefore, take $B_t = \cbk{x\in \Omega^n \mid d_T(A,x)\ge t}$, then $B^H_t = \cbk{x\in \Omega^n\mid d_H(x,A) \ge \sqrt{n}t}$ is contained in $B_t$.
+
+	\begin{thm}[Talagrand's Inequality]\label{thm: Talagrand}
+		For any $A\subset \Omega^n, t>0$, $\prob{A}\cdot\prob{B} \le e^{-\frac{t^2}{4}}$
+	\end{thm}
+	\begin{yellowBox}
+	\begin{defn}
+		We say $f:\Omega^n\To \RR$ is \emph{$h$-certifiable}, where $h:\RR\to \RR$, if for all $x\in \Omega^n$ and $s\in \RR$, if $f(x)\ge s$ there exists $I\subset [n]$ of cardinality $h(s)$ such that
+		\[
+		\forall y\in \Omega^n\quad y\mid_I = x\mid_I \Rightarrow f(y)\ge s
+		\]
+		That is - there is a subset of indices of size $h(s)$ that implies $f(y)\ge s$.
+	\end{defn}	
+	\end{yellowBox}
+	Let $f$ be $1-$Lipschitz and $h$ certifiable, define $A \defeq \cbk{x\mid f(x) \le r-t\sqrt{h(r)}}, B \defeq \cbk{x\mid f(x) \ge r}$.
+\begin{claim}
+	$B\subset B_t$
+\end{claim}
+\begin{proof}
+	We need to show that for any $x$ for which $f(x)\ge r$, there exists $\alpha\in \RR^n_+$ such that for any $y\in A$, $t\le \sum_{i:x_i\neq y_i} \alpha_i $. Let $x\in B$, and let $I$ be the certificate to $f(x)\ge r$, and let $\alpha = \frac{1}{\sqrt{|I|}}\one_{I}$. For any $y\in A$, $y$ and $x$ differ in at least $t\sqrt{h(r)}$ coordinates of $I$ since $f$ is Lipschitz, therefore
+	\[
+	\sum_{i:x_i\ne y_i} \alpha_i \ge t\sqrt{h(r)}\ge t
+	\]
+\end{proof}
+\begin{cor}
+$\prob{A}\cdot\prob{B}	\le e^{-\frac{t^2}{4}}$
+\end{cor}
+\begin{cor}
+If $L$ is the LIS of a random permutation, then	\[\prob{L\le 2\sqrt{n} - t\sqrt[4]{n}}\cdot \prob{L\ge 2\sqrt{n}}\le e^{-\frac{t^2}{4}}\]
+\end{cor}
+
+\subsection{Random Matrices Application}
+The question is how concentrated the maximal eigenvalue of a random symmetric matrix $X\in M_{n\times n}([-1,1])$? $\lambda_1(X) = \max_{\norm{v}_2 = 1}v^\top X v$, and therefore $2$-Lipschitz.
+
+\begin{claim}
+	For any $m\in \RR$, $t>0$, $\prob{\lambda_1 \le m}\cdot \prob{\lambda_1 \ge m+t}\le e^{-\frac{t^2}{64}}$
+\end{claim}
+\begin{proof}
+	Let $B$ be the event $\lambda_1 \ge m+t$, and $A$ the event $\lambda_1\le m$. We show that $B\subset B_{t/4}$ by showing for any $X$ such that $B$ holds, there exists $\alpha\in \RR_+^{{n\choose 2}+n}$ with $\norm{\alpha} = 1$ such that for any $Y$ with $\lambda_1(Y)\le m$ it holds that 
+	$\sum_{i,j}\alpha_{i,j}\one_{X^i_j\ne Y^i_j} \ge t$: Let $v\in S^{n-1}$ such that $v^\top X v = \lambda_1(X) \ge m+t$. Note that now, $v^\top Yv \le m$, hence \[
+	t\le v^\top (X-Y)v = \sum_{i,j} v_iv_j(x^i_j - y^i_j) \le \sum_{i,j} \abs{v_i}\cdot \abs{v_j}\cdot 2\one_{X^i_j\ne Y^i_j}\le 4\cdot\sum_{i,j}\alpha^i_j \one_{X^i_j\ne Y^i_j}
+	\]
+	By taking 
+	\begin{align*}
+		\alpha^i_j = \begin{cases}
+			2\abs{v_i}^2 & i=j\\
+			4\abs{v_i}\abs{v_j} & i\ne j
+		\end{cases}
+	\end{align*}
+	so we get what we want by Talagrand.
+\end{proof}
+\subsection{Geometric Interpretation of Talagrand Distance}
+Let $A\subset \Omega^n, x\in \Omega^n$, define
+\[
+U(A,x) = \cbk{s\in \cbk{0,1}^n\mid \exists y\in A\quad s_i = 1 \iff x_i\ne y_i }
+\]
+Then $d_T(A,x) = \max_{\alpha}\min_{y\in U(A,x)}\sum s_i\alpha_i$. This is minimizing a linear functional on some subset of the cube. Define $V(A,x) = \conv(U(A,x))$, then
+\[
+d_T(A,x) = \max_{\alpha} \min_{v\in V(A,x)} \sum v_i \alpha_i
+\]
+\begin{claim}
+	$d_T(A,x) = \min_{v\in V(A,x)} \norm{v}$
+\end{claim}
+\begin{proof}
+	Let $v$ be such minimizer. Let $\alpha = \frac{v}{\norm{v}}$. For any $u\in V(A,x)$ we have:
+	\[
+	\sum\alpha_i u_i \ge \sum \alpha_i v_i = \sum v_i^2/\norm{v} = \norm{v}
+	\]
+	So we get $\ge$.
+	On the other hand, take any $\alpha$, in particular the one that maximizes the RHS. We need to show that there is some $s\in U(A,x)$ such that $\sum \alpha_i s_i \le \norm{v}$. We write $v = \sum_{s\in U(A,x)} \lambda_s s$ (a convex combination). Then:
+	\[
+	\norm{v}\ge \sum\alpha_i v_i = \sum_{s\in U(A,x)} \lambda_s\tbk{\alpha,s}
+	\]
+	And since the RHS is convex combination, there must be some $s$ for which the inner product is at most $\norm{v}$.
+\end{proof}
+\section{Harris Inequality (FKG ineq.)}
+\begin{yellowBox}
+\begin{defn}
+	An event $A\subset \RR^n$ is called \emph{increasing} if for all $x,y$ such that for any $i$, $x_i\le y_i$:
+	\[
+	x\in A\Rightarrow y\in A
+	\]
+\end{defn}	
+\end{yellowBox}
+Let $x_1,\ldots x_n\in \RR$ independent random variables.
+\begin{thm}
+	[Harris ineq.] \label{thm: Harris} if $A,B$ are increasing events, then:
+	\[
+	\prob{A\cap B}\ge \prob{A}\prob{B}
+	\]
+	If $B$ is of positive probability, then:
+	\[
+	\prob{A\mid B}\ge \prob{A}
+	\]
+\end{thm}
+\begin{proof}
+	We show that for any $f,g:\RR^n\to \RR$ that are monotone (in each coordinate), then $\Exp{fg}\ge \Exp{f}\Exp{g}$, we proceed by induction on $n$. For $n=1$:
+	\begin{align*}
+		\Exp{f(x)g(x)}-\Exp{f(x)}\Exp{g(x)} = \frac12\underset{x,y\text{i.i.d}}{\EE}\sbk{(f(x)-f(y))(g(x)-g(y))}\nim{\text{same sign}}\ge 0
+	\end{align*}
+	Denote $x = (\overbrace{x_1,\ldots x_{n-1}}^{\tilde{x}},x_n)$. Now:
+	\begin{align*}
+		\EE\sbk{f(x)g(x)} = \EE_{x_n}\sbk{\EE_{\tilde{x}}f(\tilde{x},x_n)g(\tilde{x},x_n)}\nim{\text{induction}}\ge \EE_{x_n}\sbk{\EE_{\tilde{x}}[f(\tilde{x},x_n)]\EE_{\tilde{x}}[g(\tilde{x},x_n)]}= \star
+	\end{align*}
+	Note that $\EE_{\tilde{x}}[f(\tilde{x},x_n)]$ is an increasing function of $x_n$, so by induction hypothesis:
+	\begin{align*}
+		\star \ge \EE_{x_n}\sbk{\EE_{\tilde{x}}[f(\tilde{x},x_n)]}\EE_{x_n}\sbk{\EE_{\tilde{x}}[g(\tilde{x},x_n)]} = \Exp{f}\Exp{g}
+	\end{align*}
+\end{proof}
+\begin{remark}
+	If $f$ is increasing and $g$ is decreasing, it's easy to show that the opposite inequality holds, and if $f,g$ both decreasing, then the same ineq. holds.
+\end{remark}
+\begin{example}
+	What is the probability that $G\sim \Gg(n,p)$ is triangle free? Denote $T_{i,j,k}$ the event "the triangle $i,j,k$ appears", then $\overline{T_{i,j,k}}$ are decreasing, hence:
+	\begin{align*}
+		\prob{\cap_{i,j,k}\overline{T_{i,j,k}}} \nim{FKG}\ge \prod_{i,j,k}\prob{\overline{T_{i,j,k}}} = (1-p^3)^{n\choose 3}\nim{p=o(1)}=e^{-(1+o(1))\frac{p^3n^3}{6}} = e^{-(1+o(1))\Exp{\#\triangle}}
+	\end{align*}
+\end{example}
+\begin{example}
+	Let $G\sim \Gg(n,\frac{1}{2})$. Then:
+	 \[\prob{\cap_{v\in V}\deg(v)\ge\frac{n-1}{2}}\nim{FKG}\ge \prod_{v\in V}\prob{\deg(v)\ge \frac{n-1}{2}} = \rbk{\frac{1}{2}}^n\]
+	 Surprisingly - the true answer is $(c+o(1))^n$ for $c \approx 0.61$.
+\end{example}
+\begin{example}
+	Let $\Ff\subset 2^{[n]}$ such that all $A,B\in F$ intersect. Then the maximal size of $\Ff$ is $2^{n-1}$ (a nice question in extremal combinatorics). How about $\Gg$ such that no two sets cover $[n]$? same question - take complement. Cliteman asked how large can $\Hh$ be such that both properties hold? $\abs{\Hh} \le 2^{n-2}$ - take all sets that include $1$ but does not include $2$. Can be proven using FKG.
+\end{example}
+
+\chapter{The Poisson Paradigm}
+
+Recall that a Poisson random variable with parameter $\lambda$, denoted $X\sim \Pois{\lambda}$, can be though of as a limit of $X_n\sim \Bin{n,p}$. Note that setting $\lambda = np$
+\[
+\prob{X_n = k} = {n\choose k}p^k(1-p)^{n-k} = (1+o(1))\frac{n^k}{k!}\cdot\rbk{\frac{c}{k}}^k\cdot e^{-\lambda} \nim{n\to \infty}\to  e^{-\lambda}\cdot\frac{\lambda^k}{k!}
+\]
+That is - a sum of (many) random variable, almost$^\TM$ that each occur with small probability is close to a Poisson Random Variable
+
+\section{Janson Inequalities}
+	Let $A_1,\ldots A_k$ an increasing sequence of events, denote $\mu = \Exp{\sum_i \one_{A_i}}$, and $\Delta = \sum_{i\sim j} \prob{A_i\cap A_j}$, where $i\sim j$ if $A_i,A_j$ are dependent.
+	Recall the following:
+	\begin{enumerate}
+		\item If $X = \sum_i \one_{A_i}$, then $\mu = \Exp{X}$, and $Var(X)\le \mu + \Delta$, hence $\prob{X = 0} \le \frac{\mu +\Delta}{\mu^2}$
+		\item (Harris) $\prob{X = 0} \ge \prod_i \prob{\overline{A_i}} = \prod{1-\prob{A_i}} \approx e^{-(1+o(1)) p}$
+	\end{enumerate}
+\begin{thm}
+	[Janson first inequality]\label{thm: janson one}
+	Under the same setting, \[\prob{X = 0} = \prob{\cap_{i} \overline{A_i}}\le e^{-\mu + \frac{\Delta}{2}}\]
+\end{thm}
+\begin{thm}
+	[Janson second inequality]\label{thm: janson two}
+	If $\mu \le \Delta$,
+	 \[\prob{X = 0} = \prob{\cap_{i} \overline{A_i}}\le e^{-\frac{\mu^2}{2\Delta}}\]
+\end{thm}
+\begin{proof}
+	First, we show that \ref{thm: janson one} implies \ref{thm: janson two}. For any $T\subset [k]$ we have:
+	\[
+		\prob{\cap_i\overline{A_i}}\le \prob{\cap_{i\in T}\overline{A_i}} \le e^{-\mu_T+\frac{\Delta_T}{2}}
+	\]
+	Now, choose $i\in T$ with probability $q$. Then 
+	\[
+		\Exp{-\mu_T + \frac{\Delta_T}{2}} = -q\cdot \mu + \frac{q^2\Delta}{2} = \frac{-\mu}{2\Delta}
+	\]
+	Taking $q = \frac{\mu}{\Delta} \le 1$ by assumption gives the last equality. So there must be some $T$ with $-\mu_T+\frac{\Delta_T}{2}\le \frac{-\mu}{2\Delta}$, ending this claim.
+	\begin{lemma}
+		$\prob{A_i\mid \overline{A_j}: j<i} \ge \prob{A_i} - \sum_{j<i, j\sim i} \prob{A_j\cap A_i}$
+	\end{lemma}
+	\begin{proof}
+		Denote $B = \underset{j<i,j\sim i}{\cap}\overline{A_j}, C =\underset{j<i,j\not\sim i}{\cap}\overline{A_j}$. Then:
+		
+	\begin{align*}
+		&\prob{A_i\mid BC} = \frac{\prob{A_iBC}}{\prob{BC}}\ge \frac{\prob{A_iBC}}{\prob{C}} = \prob{A_iB\mid C} = \prob{A_i\mid C} - \prob{A_i\overline{B}\mid C} = \\
+		& \prob{A_i} - \prob{A_i\overline{B}\mid C}\nim{\star} \ge \prob{A_i} - \prob{A_i\overline{B}} = \prob{A_i} - \prob{A_i\cap \bigcup_{j\sim i, j<i}A_j} \nim{\text{Union Bound}}\ge \\
+		& \prob{A_i} - \sum_{i<j,i\sim j}\prob{A_i\cap A_j}
+	\end{align*}
+	with $\star$ is since $A_i$ are increasing, $C$ is decreasing and $\overline{B}$ is increasing. Then by FKG, they are of negative correlation, so the inequality holds
+	\end{proof}
+	Now, denoting $p_i = \prob{A_i\mid \overline{A_j}: j<i}$ we have
+		\begin{align*}
+		\prob{\cap\overline{A_i}} = \prod(1-p_i) \le e^{\sum p_i} = e^{-\mu + \frac{\Delta}{2}}
+	\end{align*}
+	and we are done.
+\end{proof}
+\begin{remark}
+	It always holds that $\prob{X = 0} \le e^{-\frac{\mu}{2}} + e^{-\frac{\mu^2}{2\Delta}}$. This is an exponential bound, much better than the polynomial bound obtained by second moment methods.
+\end{remark}
+\subsection{Triangles in $\Gg(n,p)$ - again!}
+Let $G\sim \Gg(n,p)$, what is the probability that $G$ is triangle free? Set $A_{i,j,k}$ be the event $i,j,k$ are a triangle in $G$, hence $\mu = \frac{n^3p^3}{6}$ and $\Delta = \frac{n^4p^5}{2}$ (we've done this before). When is $\mu > \Delta$? When $p < \frac{1}{\sqrt{3n}}$. Hence
+\begin{align*}
+	\prob{\text{Triangle Free}} \le \begin{cases}
+e^{-\mu(1+o(1))} &  p \ll \frac{1}{\sqrt{3n}}\\
+e^{-cn^2p} & p \gg \frac{1}{\sqrt{3n}}
+ \end{cases}
+\end{align*}
+
+We've already said that when $p\ll\frac{1}{n}$ then $\prob{\text{Triangle Free}}\to 1$, and when $p\gg\frac{1}{n}$ then $\prob{\text{Triangle Free}}\to 0$. What happens when $p = \Theta(1/n) = \frac{c}{n}$? In that case, $\mu \to \frac{c^3}{6}$, and $\Delta = \Oo(1/n)$. So
+\[
+e^{-\frac{c^3}{6}}\longleftarrow \rbk{1-\rbk{\frac{c}{n}}^3}^{\frac{n}{3}} \nim{\text{Harris}}\le \prob{\text{Triangle Free}} \nim{\text{Jansen}}\le e^{-\frac{c^3}{6} + \Oo(1/n)}
+\]
+\subsection{Chromatic number of $\Gg(n,\frac{1}{2})$}
+We've already established that $\chi(G)\ge (1+o(1))\frac{n}{2\log n}$
+\begin{lemma}
+	WHP, any $S\subset [n]$ of size no less of $\frac{n}{\log^2 n}$ contains a coclique of size $(1+o(1))2\log n$.
+\end{lemma}
+\begin{proof}
+\begin{align*}
+	\prob{\text{no such $S$ exists}} = {n\choose \frac{n}{\log^2 n}}\cdot \prob{S\text{ does not include such coclique}}
+\end{align*}	
+and continue using Janson...
+\end{proof}
+\begin{example}[Using Jansen]
+\begin{claim}
+	Let $C>2$, if $p = \rbk{\frac{c\cdot \log n}{n^5	}}^{1/6}$, then w.h.p between any two vertices of $G(n,p)$ there is a path of length $6$.
+\end{claim}
+\begin{proof}
+	Fix two vertices $a,b$, and let $X$ be the number of paths of length $6$ between $a,b$. Then:
+	\begin{align*}
+	& \mu = \Exp{X} = n^5(1+o(1)) p^6 = c\cdot \log n	\\
+	& \Delta = \Oo\rbk{n^5 \sum_{v=1}^5n^{5-v}\cdot p^{12-v}} = \mu^2\Oo\rbk{\sum{v=1}^5 (np)^{-v}} = \mu^2\Oo\rbk{n^{-\frac{1}{6}}}
+	\end{align*}
+	So the probability that there is no such path, that is
+	$\prob{X = 0}$, satisfies:
+	\begin{align*}
+		\prob{X = 0}\nim{\text{Chebishev}}\le \frac{1}{c\log n} + \Oo\rbk{n^{-\frac{1}{6}}}
+	\end{align*}
+	So $\prob{\text{there are $a,b$ with no such path}}\le {n\choose 2}\frac{1}{c\log n}$ - not helpful at all! But using Jansen, we have:
+	\begin{align*}
+	\prob{X = 0}\le e^{-c\log n + \Oo\rbk{\frac{\log^2n}{n^{1/6}}}}
+	\end{align*}
+	Which gives an informative bound.
+\end{proof}
+\end{example}
+\chapter{Bits and Pieces}
+\section{Entropy Method}
+\begin{yellowBox}
+\begin{defn}[Entropy]
+Let $X$ be a (finitely supported) random variable. It's \emph{Entropy} is $\Hh(X)\defeq -\sum_{x\in X}p(x)\log_w(p(x))$	
+\end{defn}	
+\end{yellowBox}
+Some facts about entropy:
+\begin{thm}
+\begin{enumerate}
+	\item $\Hh(X)\le \log_2(|X|)$, with equality iff $X\sim\Uni{Supp(X)}$
+	\item $\Hh(p) = \Hh(\Ber{p}) = -p\log p - (1-p)\log (1-p)$, and an important fact is that $${n\choose p\cdot n} \approx 2^{\Hh(p)\cdot n}$$
+	\item $X\sim \Bin{n,\frac{1}{2}}$, then $\Hh(X) = \frac{1}{2}\log n + o(1)$ \footnote{With the intuition that since $\Bin{n,\frac{1}{2}}$ is incredibly concentrated at $\mu$, we only need to understand the std, so $\sqrt{n}$.}
+	\item \textbf{Chain Rule:} $\Hh(X,Y) = \Hh(X) + \Hh(Y\mid X)$ with $\Hh(Y\mid X) \defeq = \EE_{x\sim X}\sbk{\Hh(Y\mid X = x)}$
+	\item $\Hh(Y\mid X)\le \Hh (Y)$
+	\item $\Hh(X_1,\ldots ,X_n)\le \sum_{i} \Hh(X_i\mid X_{<i}) \le \sum_{i} \Hh(X_i)$
+\end{enumerate}
+\end{thm}
+\begin{proof}
+	All properties are a corollary of Jensen and convexity etc.
+\end{proof}
+
+\subsection{Fake Coins}
+Let $A\subset [n]$ be a collection of \emph{fake} coins, we can sample $S\subset [n]$ and get $|A\cap S|$. 
+\begin{claim}
+	If $S_1\ldots S_k$ satisfy that for any $A\ne A'$ there exists $i$ such that $|A\cap S_i|\ne |A' \cap S_i|$, then $k \ge (1+o(1))\frac{2n}{\log n}$. That is, we need at least $k$ samples to classify $A$ precisely.
+\end{claim}
+\begin{proof}
+	Let $A$ be some random subset of $[n]$. Let $X_i = \abs{S_i\cap A}$. We claim that there is some bijection $(X_1\ldots X_k)\leftrightarrow 2^{[n]}$ (that is, they encode all subsets). $(X_1\ldots X_k)$ is supported by $2^n$ elements and is distributed uniformly on them. Hence:
+	\[
+	2 = \log(2^n) = \Hh(X_1\ldots X_k) \le \sum_{i}\Hh(X_i)\nim{X_i\sim \Bin{|S_i|,\frac{1}{2}}}\le \sum_i (1+o(1))\log|S_i|\le k\rbk{\frac{1}{2} + o(1)}\log n
+	\]
+\end{proof}
+\subsection{Shearer Inequality}
+\begin{thm}
+	[Shearer] $2\Hh(X,Y,Z) \le \Hh(X,Y) + \Hh(X,Z) + \Hh(Y,Z)$
+\end{thm}
+\begin{proof}
+	\begin{align*}
+	\Hh(X,Y,Z) = \Hh(X) + \Hh(Y\mid X) = \Hh(Z\mid X,Y)	
+	\end{align*}
+	so
+		\begin{align*}
+	2\Hh(X,Y,Z) = \Hh(X) + \Hh(Y\mid X) = \Hh(Z\mid X) + \Hh(X) + \Hh(Y) + \Hh(Z\mid Y)	
+	\end{align*}	
+	As required
+\end{proof}
+\begin{cor}
+Let $S\subset \RR^3$, then $Vol(S)^2\le 	Ar(S_{x,y})Ar(S_{x,z})Ar(S_{y,z})$ with $S_{x,z}$ is the shadow of $S$ on $x,z$ plane.
+\end{cor}
+\begin{proof}
+	Take some finite $P \subset \RR^3$. We show $|P|^2 \le |P_{x,y}|\cdot|P_{x,z}|\cdot|P_{y,z}|$: Let $(X,Y,Z)$ be a random point in $P$. Then
+	$\log(|P|) = \Hh(X,Y,Z)$ so
+	 $$\log|P|^2 = 2\Hh(X,Y,Z) \le \Hh(X,Y) + \Hh(X,Z) + \Hh(Y,Z) \le \log|P_{x,y}| + \log|P_{x,z}| +\log|P_{y,z}|$$
+	 Taking exponent on both sides finishes the proof. For the continuous case - take a tight enough lattice $\varepsilon\ZZ^3\cap S$ approximating $S$ 
+\end{proof}
+\begin{thm}
+	[Shearer, generalized]\label{thm: Shearer General}
+	Let $X_1\ldots X_n$ be random variables and $A_1,\ldots A_m\subset[n]$ such that any $i\in [n]$ belongs to at least $k$ of the $A_j$'s. Denote by $X_{A_j}$ the (multivariate) random variable comprised of all $X_i$ such that $i\in A_j$ .Then:
+	\[
+	\sum_{j=1}^m \Hh\rbk{X_{A_j}} \ge k\Hh(X)
+	\]
+\end{thm}
+\begin{remark}
+	The previous Shearer inequality is a private case of this - taking $A_1 = \cbk{1,2}, A_2 =\cbk{1,3}, A_3 = \cbk{2,3}$
+\end{remark}
+\begin{proof}
+	\begin{align*}
+		&\sum_{j=1}^m \Hh\rbk{A_{X_j}} = \sum_{j=1}^m\sum_{i\in A_j} \Hh\rbk{X_i\mid X_t\text{ such that }t<i, t\in A_j} \ge \\
+		&\sum_{j=1}^m\sum_{i\in A_j} \Hh\rbk{X_i\mid X_t\text{ such that }t<i}  \ge \sum_{i=1}^n \Hh\rbk{X_i \mid X_{<i}}\cdot k
+ = k \cdot \Hh(X)	\end{align*}
+\end{proof}
+\begin{thm}
+	[Kruskal Katona, easy case]\label{thm: Kruskal Katona} Let $G$ be a graph over $e$ edges and $t$ triangles. Then $t\le \frac{(2e)^{\frac{3}{2}}}{6}$
+\end{thm}
+\begin{remark}
+	The hard(er) case states that if $e = {x\choose 2}$ for some $x$, then $t\le {x\choose 3}$ which is the intuition from taking $e$ be the edges of a complete graph. Thinking of $e = \frac{x^2}{2}$ and ${x\choose 3}$ as $\frac{x^3}{6}$ gives the intuition to the theorem
+\end{remark}
+\begin{proof}
+	Let $X_1,X_2,X_3$ be a vertices of a triangle. Then 
+	\[
+	\log_2(6t) = \Hh(X_1,X_2,X_3)\nim{\ref{thm: Shearer General}}\le\frac{1}{2}\rbk{\Hh(X_1,X_2) + \Hh(X_2,X_3) + \Hh(X_1,X_3)} = \star
+	\]
+	Note that $(X_1,X_2)$ is some distribution on the edges - so $\Hh(X_1,X_2)\le \log(2e)$. Then
+	\[
+	\log_2(6t) \le \star \le \frac{3}{2}\log(2e)
+	\]
+	Completing the proof.
+\end{proof}
+\subsection{Jeff Khan's Theorem}
+\begin{thm}[Jeff Khan]\label{thm: Jeff Khan}
+	Let $G$ be a bipartite $d$--regular graph over $n$ vertices with parts $A,B$. Denote by $\iota(G)$ the number of independent sets in $G$. Then 
+	\[
+	\iota(G) \le (2^{d+1}-1)^{\frac{n}{2d}}
+	\]
+\end{thm}
+\begin{remark}
+	Take $K_{d,d}$, then $\iota(K_{d,d}) = 2^{d+1}-1$ (since we counted the empty set twice), so the theorem is in fact "the best case is to take copies of $K_{d,d}$".
+\end{remark}
+
+\begin{proof}
+	Let $X = (X_1\ldots X_n)$ be indicator vector of a randomly chosen independent set. Then 
+	\[
+	\log(\iota(G)) = \Hh(X) = \Hh\rbk{A_A} + \Hh(X_B\mid X_A)\nim{\ref{thm: Shearer General}}\le \frac{1}{d}\sum_{b\in B}\Hh(X_{N_b}) + \sum_{b\in B}\Hh(X_b\mid X_{N_b})
+	\]
+	So we need to show that for any $b$, $\Hh(X_{N_b}) + d\Hh(X_b\mid X_{N_b}) \le \log(2^{d+1}-1)$. Let $Y$ be sampling of $X_{N_b}$ and of $d$ independent copies of $(X_b\mid X_{N_b})$, $X_b^{(1)},X_b^{(2)},\ldots X_b^{(d)}$. Note that $Y$ is supported on $\iota(K_{d,d})$. Now, $\Hh(Y) = \Hh(X_{N_b}) + \sum_{j=1}^d \Hh(X_b^{(i)}\mid X_{N_b})$ since $X_b^{(i)}$ are independent. So we are done.
+\end{proof}
+
+\subsection{Latin Squares}
+\begin{yellowBox}
+\begin{defn}
+	[LatinSquare] A Latin square is an $n\times n$ array in which every sign $i\in [n]$ appears exactly once in every row and every column.
+\end{defn}	
+
+\end{yellowBox}
+\begin{question}
+	How many Latin squares are there?
+\end{question}
+Denote the number of Latin squares over $n$ symbols by $L_n$. A guess would be \[L_n \approx \overbrace{n^{n^2}}^\text{write every symbols}\cdot\overbrace{\rbk{\frac{n!}{n^n}}^{2n}}^\text{cosntrains} \approx \rbk{\frac{n}{e^2}}^{n^2}\]
+\begin{thm}
+	${\displaystyle L_n \le \rbk{(1+o(1))\frac{n}{e^2}}^{n^2}}$
+\end{thm}
+\begin{proof}
+	Let $X_{i,j}$ be a random Latin square. Then
+	\begin{align*}
+		&\log(L_n) = \Hh(X) \nim{\star}= \underset{\text{random order }<}{\EE}\sbk{\sum_{i,j}\Hh(X_{i,j}\mid X_{<{i,j}})} = \\
+		&\sum_{i,j}\EE_{<}\sbk{\Hh(X_{i,j}\mid X_{<i,j})} = n^2\EE_{<}\sbk{\Hh(X_{1,1}\mid X_{<1,1})} = n^2 \EE_< \overbrace{\underset{L}{\EE}\sbk{\Hh(X_{1,1}\mid X_{<11} = L_{<11}}}^\text{Expose according to random Latin square} \le \\
+		& \EE_< \EE_L \sbk{\log\overbrace{(N_{1,1}(L,<))}^\text{\#\text{of signs not taken in $L_{1,1}$}}} = \EE_L \EE_< \log(N_{1,1}(L,<)) = \heartsuit
+	\end{align*}
+	$\star $ - we sample $<$ by sampling $t_{i,j}\sim \Uni{[0,1]}$ i.i.d. Therefore \[
+	\EE_< \log(N_{1,1}) = \int_0^1 \EE_{[0,1]^{n^2-1}}\log(N_{1,1}(t_{1,1})) dt_{1,1} \nim{\text{Jensen}}\le \int_0^1 \log \Exp{N_{1,1}(t_{1,1})}dt_{1,1} = \triangle
+	\]
+	Now
+	\[
+	\Exp{N_{1,1}(t_{1,1},<,L)} = 1 + (n-1)(1-t_{1,1})^2
+	\]
+	Hence 
+	\[
+	\triangle = \int_0^1 \log(n(1-t_{1,1})^2(1+o(1)))dt_{1,1} = \log(n) + -2 + o(1)
+	\]
+	We now have
+	\[
+	\heartsuit \le n^2(\log(n) - 2/\ln(2) + o(1))
+	\]
+So calculations work.
+	\end{proof}
+	\subsection{Bergman Inequality}
+	\begin{thm}
+		[Bergman Inequality]\label{thm: Bergman} Let $G$ be a bipartite graph over $L\sqcup R$ with $|L| = |R| = n$, and let $d_1,\ldots d_n$ be the sequence of degrees in $L$. Then the number of perfect matchings in $G$ satisfies
+		\[
+		PM(G)\le \prod_{i=1}^n(d_i!)^\frac{1}{d_i}
+		\]
+	\end{thm}
+	\begin{remark}
+		$PM(G)$ can be though of as the \emph{permanent} (determinant without signs) of the $n\times n$ bi-adjacency matrix of $G$.
+	\end{remark}
+	\begin{cor}
+		The number of latin squares over $n$ symbols satisfies $L_n \le \rbk{(1+o(1)\frac{n}{e^2}}^{n^2}$
+	\end{cor}
+	\begin{proof}
+		Think of an empty matrix $n\times n$ and choose some permutation to fix the symbol $1$. Then, the empty cells of the matrix are a bipartite graph (with parts "rows" and "columns" as the parts). Assigning the symbol $2$ is to find a perfect matching in this graph, and by Bergman there are $\prod_{i\in [n]}(n-1)^{1/(n-1)}$ matchings. This gives 
+		\[
+		L_n\le \prod_{d = n}^1(d!)^{\frac{n}{d}}
+		\]
+		and the bound is achieved by Sterling approximation.
+	\end{proof}
+	
+	\begin{proof}
+		[Proof (Bergman, \ref{thm: Bergman})] Let $X = (X_1,\ldots X_n)$ where $X_i$ is the neighbor of $i\in L$ in a random perfect matching. Then:
+		\begin{align*}
+			&\log(PM(G))=\Hh(X) = \EE_{<}\sum_{i=1}^n \Hh(X_i\mid X_{<i}) - \sum_{i=1}^n \EE_{<}\Hh(X_i\mid X_{<i}) = \\
+			&\sum_{i=1}^n \EE_{<}\sbk{\underset{M\text{ matching}}{\EE}\Hh(X_i\mid X_{<i} = M_{<i})} \le \sum_{i=1}^n \EE_{<,M}\log(\overbrace{N_i(<,M)}^\heartsuit)  = \\
+			&\sum_{i=1}^n \frac{1}{d_i}\sum_{j=1}^{d_i}\log(j)  = \sum_{i=1}^n \frac{1}{d_i}\log(d_i!) = \sum_{i=1}^n \log\rbk{(d_i!)^{\frac{1}{d_i}}}
+		\end{align*}
+		Where $\heartsuit$ is the number of available neighbors of $i$ when we reach it in the order, which is the support of $X_i$ conditioned by $X_{<i} = M_{<i}$. Note that $N_i(<,M)\sim \Uni{[d_i]}$: Consider $N(i)$; then any permutation affects $N_i(<,M)$ by asking "how many vertices in $N(i)$ were exposed before $i$?". Since $<$ is uniform, then the place where $i$ was exposed is uniform. Taking exponent on both sides gives the result
+	\end{proof}
+	\subsection{GCFS}
+	\begin{thm}
+		[Easy theorem] If $\Ff\subset 2^{[n]}$ is intersecting, then $|Ff|\le 2^{n-1}$
+	\end{thm}
+	\begin{quest}
+		What is the maximal size of a family of graphs $\Gg\subset 2^{[n]\choose 2}$ such that any $G_1,G_2\in \Gg$ intersect in a triagel?
+	\end{quest}
+	\begin{thm}
+		[Alice, Filmus, Fridgit, 2012] $|\Gg|\le 2^{{n\choose 2}-3}$
+	\end{thm}
+	\begin{thm}
+		[Gram-Chang-Frenkel-Shearer]
+		$|\Gg|\le 2^{{n\choose 2}-2}$
+	\end{thm}
+	\begin{proof}
+		Assume $n \equiv 0\mod 2$. For any $S\subset [n]$ with $|S| = \frac{n}{2}$, define $E_S \defeq \cbk{e\in E\mid e\in S \vee e\in \overline{S}}$. Let $K$ be the number of $S$'s fir which a given edge belongs to $E_S$ Note that 
+		\[
+		{n\choose 2}K = {n\choose \frac{n}{2}}\cdot |E_S|
+		\]
+		Then:
+		\begin{align*}
+			\Hh(G\in \Gg)\nim{Shearer\; \ref{thm: Shearer General}} \le \frac{1}{K}\sum_{S\in {[n]\choose \frac{n}{2}}} \Hh(\overbrace{G\mid_{E_S} \mid G\in \Gg}^\text{Intersecting Family!})\le \frac{1}{K}{n\choose \frac{n}{2}}(|E_S|-1)
+		\end{align*}
+	\end{proof}
+	\section{Phase Transition in Random Graphs}
+	The question at hand is how do connected components look in random graphs.
+	\begin{thm}
+		[Erdo\"{o}s, R\'{e}nyi, '59] \label{thm: Erdos Renyi} Let $G\sim \Gg(n,p)$ with $p = \frac{c}{n}$ for some $c > 0$. Denote by $C_i$ the size of the $i$'th connected components ($C_1$ being the largest). Then with high probability:
+		\begin{enumerate}
+			\item If $c<1$ then $C_1 = O(\log(n))$.
+			\item If $c=1$, not that important but $C_1 = \Theta(n^{2/3})$. In fact, for any fixed $j$, $C_j = \Theta(n^{2/3})$
+			\item If $c>1$ then $C_1 = \Theta(n)$, we call it the \textbf{giant} components, and $C_2 = O(\log(n))$.
+		\end{enumerate}
+	\end{thm}
+	\begin{remark}
+		The intuition here is that $c = np \approx\Exp{\deg(v)}$.
+	\end{remark}
+	\begin{yellowBox}
+	\begin{defn}
+		A Galton-Watson poisson tree with parameter $c$ is a tree generated by taking a root $r$, and generating $\Pois{c}$ successors, and continuing with each of the generated vertices. Denote the tree by $GW(c)$.\\
+		More formally, let $Z_1,Z_2\ldots \nim{i.i.d.}\sim \Pois{c}$. Denote $Y_0 = 1$, and $Y_t \defeq Y_{t-1} - 1 + Z_t$, that is $Y_t = 1 + \sum_{i=1}^t (Z_i-1)$. We think of $z_t$ as the children of the $t$'th vertex, and $Y_t$ as the bumber of vertices we've seen in time $t$. Let $T = \inf \cbk{t\mid Y_t = 0}\in \NN\cup \cbk{\infty}$. 
+	\end{defn}	
+	\end{yellowBox}
+	\begin{thm}
+		[Erdo\"{o}s, R\'{e}nyi reformulated] \label{thm: Erdos Renyi reformulated}
+		We have:
+		\begin{enumerate}
+			\item If $c \le 1$ then $\prob{T<\infty}\To 1$
+			\item If $c > 1$ then $\prob{T=\infty} = y > 0$ with $1-y = e^{-cy}$.
+		\end{enumerate}
+	\end{thm}
+
+	\begin{proof}
+		[First Proof, using BFS]
+		Note that $\deg(v)\sim \Bin{n-1, p}\approx \Pois{c}$. Then running BFS on $G$ results in (sort of) $GW(c)$ - in the BFS process, once we've exposed enough vertices, the successors of a vertex does not distribute as $\Pois{c}$ since the binomial distribution is not with parameter $n-1$. \\
+		\begin{enumerate}
+			\item Assume $c<1$. Note that $Y_t > 0 \iff \sum_{i=1}^t (z_i-1) \ge 0$, but this is a sum of i.i.d random variables with expectation $c < 1$, so by the law of large numbers, $\prob{\sum_{i=1}^t (z_1-1) \ge t}\To 0$
+			\item Now assume $c\ge 1$. Denote $y = \prob{T=\infty}$, then:
+			\[
+			1-y = \prob{T < \infty} = \sum_{i=1}^\infty \prob{z_i = i}(1-y)^i = e^{-cy}
+			\]
+			With the last equality by opening the definition of poisson distribution. Then if $c =1$ we are done (y=0), and if $c>1$ then we have $y>0$.
+		\end{enumerate}
+	\end{proof}
+	We can strengthen (3) in \ref{thm: Erdos Renyi}:
+	\begin{claim}
+		If $c>1$, then $C_1 = (y+o(1))n$ for $y$ that satisfies $1-y = e^-{cy}$.
+	\end{claim}
+	\begin{remark}
+		If $c = 1+\varepsilon$, then $y \approx 2\varepsilon$.
+	\end{remark}
+	\begin{thm}
+		Let $c>0$, denote the size of $GW(c)$ by $T_c$. Then for any $k\in \NN$,
+		\[
+		\prob{T_c = k} = \lim_{n\to \infty}\prob{\abs{C_v(\Gg\rbk{n,\frac{c}{n}}} = k} =\frac{ e^{-ck}(ck)^{k-1}}{k!} \approx\frac{1}{\sqrt{2\pi}}k^{-\frac{3}{2}}\rbk{ce^{1-c}}^k
+		\]
+		for some $v\in V$.
+	\end{thm}
+	\begin{proof}
+		Let $z_1,\ldots,z_k$ be a sequence of numbers such that if $Y_t\defeq 1 + \sum_{i=1}^t(z_i-1)$, then $Y_t\ge 0$ for any $t<k$, and $Y_k = 0$. Then 
+		\begin{align*}
+			& \prob{T_c = k} = \sum_{z} \prob{\forall t\in [k]\quad Z_i = z_i}	= \sum_{z} \prod_{i=1}^k\prob{\Pois{c} = z_i}	
+		\end{align*}
+		Now,
+		\begin{align*}
+			& \prob{\abs{C_v(\Gg\rbk{n,\frac{c}{n}}} = k} = \sum_z \prob{\text{(any $i$) the $i$'th vtx in the BFS starting from $v$ had $z_i$ new neighbors}} = \\
+			&\sum_z\prod_{i=1}^k\prob{\Bin{n-1-\sum_{j<i}z_j,\frac{c}{n}} = z_i} = \sum_z \prod_{i=1}^k(1+o(1))\prob{\Pois{c} = z_i}
+		\end{align*}
+		Which shows the first equality. 
+		Now, what is $\prob{\abs{C_v(G)} = k}$?
+		\[
+		\prob{\abs{C_v(G)} = k, \text{and not a tree}}\le {n\choose k-1}2^{k\choose 2}\rbk{\frac{c}{n}}^k\To 0
+		\]
+		\[
+		\prob{\abs{C_v(G)} = k, \text{and a tree}}= {n\choose k-1}k^{k-1}\rbk{\frac{c}{n}}^{k-1}\cdot \rbk{1-\frac{c}{k}}^{k(n-k)} \To \frac{(ck)^{k-1}e^{-ck}}{k!}
+		\]
+	\end{proof}
+	Let $c = 1-\varepsilon$, then by Taylor's approximation, $ce^{1-c}\approx e^{-\frac{\varepsilon^2}{2}}$. Now,
+	\[
+	\prob{T_C \ge k} =e^{-\frac{\varepsilon^2}{2}k(1+o(1))}
+	\]
+	We now have:
+	\begin{claim}
+		If $c = 1-\varepsilon$, then $C_1 = O\rbk{\frac{1}{\varepsilon^2}\log(n)}$
+	\end{claim}
+	\begin{proof} For any $k$ (no necessarily fixed!)
+		$\prob{C_v\rbk{\Gg(n,\frac{c}{n}}\ge u}\le (1+o(1)) \prob{T_C \ge u}$. Take $u = K\frac{\log(n)}{\varepsilon^2}$ ane we are done.
+	\end{proof}
+	\appendix
 \chapter{Extras}
 \section{Crossing number}
 Turan worked on this in WWII.
