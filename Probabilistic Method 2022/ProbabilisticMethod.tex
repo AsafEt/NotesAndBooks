@@ -1656,7 +1656,105 @@ So calculations work.
 	\begin{proof} For any $k$ (no necessarily fixed!)
 		$\prob{C_v\rbk{\Gg(n,\frac{c}{n}}\ge u}\le (1+o(1)) \prob{T_C \ge u}$. Take $u = K\frac{\log(n)}{\varepsilon^2}$ ane we are done.
 	\end{proof}
+	\begin{claim}
+		If $c>1$, then $C_1 = (y+o(1))n$ for $y$ such that $1-y = e^{-cy}$, and $C_2 = O(\log(n))$.
+	\end{claim}
+	\begin{proof}
+		Denote all components of size $O(\log(n))$ \emph{small}, all of size $(y\pm\delta)n$ \emph{large}, and all other components \emph{special}.
+		\begin{prop}
+			$\prob{\text{there exists a special component}}\To 0$
+		\end{prop}
+		\begin{proof}
+			First, we note that $$\prob{C_v\rbk{\Gg(n,p)}} = t \le \prob{\Bin{n-1,(1-p)^t} = n-t} = \prob{\Bin{n-1, 1-(1-p)^t} = t-1}$$
+			Assume $t = xn$ for $x\notin y\pm\delta$. Note that since $1-y = e^{-cy}$, this implies that $\abs{x-(1-e^{-xy}} > \delta'$. Therefore
+			\begin{align*}
+				\prob{|C_v| = xn} \nim{\approx}\leq \prob{\Bin{n-1,1-e^{-cx}} = xn}\le e^{-K(\delta')^2n}
+			\end{align*}
+			We are left with the case $K\log(n) < t < \delta n$. We now note that $1-(1-p)^t \approx \frac{tc}{n}$, hence
+			\[
+			\prob{Cv = t} = \prob{\overbrace{\Bin{n-1,\frac{tc}{n}}}^{\EE = cn > n} = t-1}\le e^{-K_1t} = o\rbk{\frac{1}{n^2}}
+			\]
+		\end{proof}
+		\begin{prop}
+			$\prob{\text{there exists two large components}}\To 0$
+		\end{prop}
+		\begin{proof} Heading towards contradiction, assume there are two components of size $yn$ (approx.), and let $G' = G \cup \Gg\rbk{n,\frac{c}{n}+\frac{1}{n^{3/2}} - \frac{c}{n^{5/2}}}$. Then the probability that there are two giant components is bounded by the probability that there is a special component in $G'$ + $o(1)$, which tends to $0$.
+		\end{proof}
+		\begin{prop}
+			$\prob{C_v \ge k\log(n)}\To y$
+		\end{prop}
+		\begin{proof}
+		Denote $k\log n = \alpha$. Now:
+		\begin{align*}
+			\prob{T_\Bin{n-\alpha,p} \ge \alpha }\le \prob{C_v \ge \alpha}\le \prob{T_\Bin{n-1,p}\ge \alpha}
+		\end{align*}
+		We now claim both LHS and RHS tend to $\prob{T_\Pois{c}\ge \alpha}$. Denote $T_{\Pois{c}} = T_c$. 
+		\begin{align*}
+			\prob{T_c \ge \alpha} = \prob{T_c = \infty} + \prob{\alpha \le T_c < \infty} = y + o(1)
+		\end{align*}
+		\end{proof}
+		We are now ready to prove the claim. 
+		\begin{align*}
+			& y + o(1) =\prob{C_v \ge k\log(n)} \le\\
+			& \prob{\exists \text{ special component}} + \prob{|C_1| \approx yn, v\in C_1} + \prob{\exists\text{ More than one giant}} \le\\
+			& o(1) + \prob{|C_1| \approx yn}\cdot \prob{v\in C_1\mid |C_1| \approx yn} \nim{\text{Symmetry}}= o(1) + \prob{|C_1| \approx yn}\cdot \frac{|C_1|}{n}
+		\end{align*}
+		So $\prob{|C_1|\approx yn} \ge 1-o(1)$.
+	\end{proof}
+	\begin{claim}
+		If $p = \frac{1}{n}$, then $\prob{C_1\ge \alpha n^{\frac{2}{3}}}\le C_1\alpha^{-\frac{2}{3}}$
+	\end{claim}
+	
+	\begin{proof}
+		$\prob{C_v \ge u}\le \prob{T_1 \ge u} = \sum_{k=u}\frac{1}{\sqrt{2\pi}}k^{-\frac{2}{3}} = Cu^{-\frac{1}{2}}$
+		And now
+		\begin{align*}
+			\prob{C_1\ge u}\cdot u\le \Exp{u\le \text{number of vertices in the component}} = n\cdot\prob{C_v \ge u}\le nCu^{-\frac{1}{2}}\cdot n
+		\end{align*}
+		So a simple analysis works.
+	\end{proof}
+	\subsection{Using DFS}
+	We now prove the same theorem using a DFS intuition: Let $(X_i)_{i=1}^{n\choose 2}$ be the DFS queries, and note that $X_i\nim{\text{i.i.d}}\sim \Ber{p}$.
+	\begin{thm}
+		if $c = 1-\varepsilon$, then there is no component larger than $\frac{7\log(n)}{\varepsilon^2} = k$. 
+	
+	\end{thm}
+	\begin{proof}
+		Heading towards contradiction, consider the moment in which a certain component had passed the threshold $k$. Consider the interval in the DFS process starting the exploration of the component until the aforementioned moment. Then the number of queries until this stage is no more than $k\cdot n$, and the number of positive responses is exactly $k$.
+				\begin{align*}
+			\prob{\text{there exists a $kn$ sequence of $X_i$ with $k$ ones}} = n^2\prob{\Bin{kn,p} = p}\le n^2e^{-\frac{\varepsilon^2 k}{3}}\le n^{-\frac{7}{3}} \to 0
+		\end{align*}
+	\end{proof}
+	\begin{thm}
+		If $c = 1+\varepsilon$, then there exists a path of size $\ge \frac{\varepsilon^2 n}{5}$.
+	\end{thm}
+	\begin{proof}
+		
+	\end{proof}
+	\claim sdfsdf
+	\begin{proof}
+		Consider the DFS process after $m = \frac{\varepsilon n^2}{2}$ steps. Then the number of active vertices at this stage is $|B| \ge \frac{\varepsilon^2 n}{5}$ - we show this.\\
+		
+		At this stage, the number of nodes that were fully explored is $|C| < \frac{n}{3}$: Otherwise, consider the first time where $|C| = \frac{n}{3}$, in this stage $|B| \le \frac{n}{3}$ w.h.p: 
+		\begin{align*}
+			\prob{\sum_{i=1}^m X_i - \frac{\varepsilon(1+\varepsilon)}{n} > n^\frac{2}{3}} \to 0
+		\end{align*}
+		 and now $\frac{n}{3} > \frac{(1+\varepsilon)\varepsilon}{2} + n^{\frac{2}{3}}$. Therefore the unvisited nodes are of size $|A| \ge \frac{n}{3}$, which is a contradiction because $|A|\cdot|C| \le m$.
+		 
+		 
+		 Now we are ready to complete the proof. By the previous claim, $|B\cup C|\ge \frac{\varepsilon(1+\varepsilon)n	}{2} - n^{\frac{2}{3}}$. By contradiction, if $|B| < \frac{\varepsilon^2 n}{5}$ then $|C| \ge n\rbk{\frac{\varepsilon}{2} + \frac{3\varepsilon^2}{10} - n^{-\frac{1}{3}}}$. Therefore, 
+		 \[
+		 |A|\cdot |C| \ge (n-\frac{\varepsilon^2n}{5} - |C|)\cdot |C| = \star
+		 \]
+		 Note that the RHS is an inverted parabola in $|C|$ that's maximized in approx. $\frac{n}{2}$ - it is increasing until then, and since $|C| < \frac{n}{3}$, we can plug in the lower bound on $|C|$ fond earlier and decrease:
+		 \begin{align*}
+		 &\star \ge \rbk{n-\frac{\varepsilon^2n}{5} - n\rbk{\frac{\varepsilon}{2} + \frac{3\varepsilon^2}{10} - n^{-\frac{1}{3}}}}\cdot n\rbk{\frac{\varepsilon}{2} +\frac{3\varepsilon^2}{10} - n^{-\frac{1}{3}}} = n^2\rbk{\frac{\varepsilon}{2} - \frac{\varepsilon^2}{4} + \frac{3\varepsilon^2}{10} + O(\varepsilon^3)} = \\ 
+		 & n^2\rbk{\frac{\varepsilon}{2} + \frac{\varepsilon^2}{20} + O(\varepsilon^3)}
+		  \end{align*}
+		  Which is a contradiction once again to $|A|\cdot|C| \le m$
+	\end{proof}
 	\appendix
+	
 \chapter{Extras}
 \section{Crossing number}
 Turan worked on this in WWII.
@@ -1669,10 +1767,40 @@ Turan worked on this in WWII.
 \end{claim}
 \begin{proof}
 	From Euler's Formula
-\end{proof}
 And now consider taking a random induced subgraph $G'$ we have that $\Exp{c(G')} = p^4c\ge p^2e - 3pv$, thus
 	\[
 	c\ge \frac{e}{p^2}-\frac{3v}{p^3}
 	\]
-optimizing $p$ we get $p = \frac{9v}{2e}$, so when $e > \frac{9v}{2}$, then $c \ge \alpha\cdot \frac{e^3}{v^2}$ Plugging into LHS (when $p<1$). Therefore when taking a dense subgraph $e\sim v^2$, then $c\gtrsim v^4$
+optimizing $p$ we get $p = \frac{9v}{2e}$, so when $e > \frac{9v}{2}$, then $c \ge \alpha\cdot \frac{e^3}{v^2}$ Plugging into LHS (when $p<1$). Therefore when taking a dense subgraph $e\sim v^2$, then $c\gtrsim v^4$.
+\end{proof}
+\section{The Kahn-Kalai Conjecture}
+Let $G\sim \Gg(n,p)$, and $H = K_4\setminus e$. Then $\Exp{\# H\text{ in } G} \approx n^4p^5$ so when $p\ll n^{-4/5}$ it is very small.
+Let $\mu_p$ be the induced probability measure on $2^X$: $\mu_p(A) \defeq p^{|A|}(1-p)^{|X|-|A|}$. In our setting $X = {[n]\choose 2}$ the edges of a graph, and then $X_p = \Gg(n,p)$, so for $\Ff\subset 2^X$, $\sum_{A\in \FF} p^{|A|}$ is the expected number of sets from $\Ff$ that appear in $\Gg(n,p)$. Therefore, if $\Ff$ is an increasing family of subsets, $\mu_p(\FF) = \prob{X_p\in \Ff}$, where $X_p\sim \mu_p$. In the context of graphs, this means that some property is increasing. With respect to some property $\Ff$, the $p(\FF)$ in which $\mu_p(\Ff) = \frac{1}{2}$ is called the critical point. For example, let $\Ff_H$ be the family of graphs in which there is a copy of $H$, and a necessary condition is that $p(\Ff_H) \ge n^{-4/5}$.
+\begin{defn}
+	Let $\Ff\subset 2^X$ be an increasing family, we say that $\Gg$ is a cover of $\Ff$ if $\Ff\subset \tbk{\Gg} \defeq \bigcup_{S\in \Gg}\cbk{T\in 2^X\mid S\subset T}$.
+\end{defn}
+\begin{defn}
+	We say that a covering $\Gg$ is $p$-cheap when $\sum_{S\in \Gg} p^{|S|}\le \frac{1}{2}$, and that $\Ff$ is $p$-small if there exists a $p$-cheap covering of $\Ff$.
+\end{defn}
+\begin{claim}
+	If $\Ff$ is $p$-cheap then $p(\Ff)\ge p$.
+\end{claim}
+\begin{proof}
+	We have:
+	\[
+	\mu_p(\Ff) \le \mu_p(\tbk{\Gg}) \le \sum_{S\in \Gg} \mu_p(S) = \sum_{S\in \Gg} p^{|S|} \le \frac{1}{2}
+	\]
+\end{proof}
+Let $q(\Ff)\defeq \max\cbk{p\mid \Ff \text{ is $p$-small}}$, and we denote $\ell(\Ff)$ the maximal cardinality of a minimal element in $\FF$.
+\begin{conjecture}[Kahn - Kalai] Let $\Ff$
+	There exists a universal constant $K$ such that for any $X$ and any increasing property $\Ff$, $p(\Ff) \le Kq(\Ff)\log(\ell(\FF))$.
+\end{conjecture}
+Hereafter we think of $\Ff$ as a hypergraph. A reformulation of the conjecture is:
+\begin{thm}
+	There exists a universal constant $L$ such that for any $\ell$-bounded hypergraph\footnote{The edges are of cardinality at most $\ell$} that is not $p$ small, if we choose a random element $\Omega$ of cardinality $Lp\log(\ell)n$, then $\Omega \in \tbk{\Ff}$ with probability $1-o_\ell(1)$.
+\end{thm}
+\begin{proof}
+	Assume we have an $s$-bounded hypergraph $\Hh_{i-1}$ and we construct $\Hh_{i}$. Let $S,S',\hat{S}\in \Hh_{i-1}$. Let $W_i$ be a random set of cardinality $\approx Lpn$. For any $S$, we consider $S\cup W$, and all $S'\subset S\cup W$. We call $S'\setminus W$ an $(S,W)$-fragment. $T(S,W)$ is the minimal $S$ fragment (with respect to cardinality), denote its size by $t(S,W)$. Given $W$, define $\Gg_i = \Gg(W_i)\defeq \cbk{S\in \Hh_{i-1}\mid t(S,Wi) \ge 0.9s}$. Let $\Uu_i \defeq \cbk{T(S,W_i)\mid S\in \Gg_i}$, and note that $\Uu_i$ is a covering of $\Gg_i$. We now define $\Hh_i \defeq \cbk{T(S,W_i)\mid S\in \Hh_{i-1}\setminus \Gg_i}$. Now $\Hh_i$ is $0.9s$ bounded, and $\Hh_{i-1}\setminus \Gg_i\subset \tbk{\Hh_i}$.
+
+\end{proof}
 \end{document}
